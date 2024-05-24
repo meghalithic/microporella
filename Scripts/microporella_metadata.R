@@ -1,212 +1,78 @@
 #This script reconciles image names with metadata to ensure that there are no errors
-#1. gets list of file names and checks for duplicates
-#2. extracts metadata from txt files
-#3. combines files
-#4. makes sure there are no discrepensies in metadata with image info
+#1. matches images with associated metadata
+#2. checks for discrepancies in info
 
 #### LOAD PACKAGES ----
-require(stringr)
-require(dplyr)
-require(splitstackshape)
-require(data.table)
+source("Scripts/env.R")
 
-#### GET PATH -----
-images.path <- "../../../../../../../media/voje-lab/00C67493C6748AA4/Microporella/"
+#### LOAD DATA ----
+meta.df <- read.csv("Data/Microporella_SEMs_EDM+Mali_20.09.2022.csv",
+                    header = TRUE)
 
-#### 1. LIST OF FILE NAMES ----
+images.path <- "../../../../../voje-lab/Desktop/microporella-jpg"
 
-##https://stackoverflow.com/questions/54510134/getting-list-of-file-names-in-a-directory
-# To list all files of a folder in a list variable including files 
-# from sub-folders. The code below gets the full path of files not just names.
-#list = list.files(path = full_path_to_directory ,full.names=TRUE,recursive=TRUE)
-# To get names of all files from their corresponding paths in all_names variable.
-#all_names = basename(list)
-# To write all_names variable to a CSV file.
-#write.csv(all_names, "test.csv")
+imageNames.jpg = list.files(path = images.path,
+                        full.names = TRUE,
+                        recursive = TRUE)
+imageNames.jpg.trim <- gsub(imageNames.jpg,
+                        pattern = paste0(images.path, "/"),
+                        replacement = "")
+imageNames <- gsub(imageNames.jpg.trim,
+                        pattern = ".jpg",
+                        replacement = "")
 
-## get folder names
-list = list.files(path = images.path,
-                  full.names = TRUE,
-                  recursive = TRUE)
+#### COMBINE ----
+length(imageNames) #7333
+imageNames[duplicated(imageNames)] #none
 
-##### PARSE FILE NAMES -----
-listPath <- unlist(list)
-length(listPath) 
+nrow(meta.df) #8828
+dupes <-meta.df$Image_ID[duplicated(meta.df$Image_ID)] #these are repeats
+######for now, ignore and remove these-------
+meta.df.trim <- meta.df[!(meta.df$Image_ID %in% dupes),]
+nrow(meta.df.trim) #8812
 
-list.trim <- gsub(list,
-                  pattern = images.path,
-                  replacement = "")
+#setdiff(imageNames, meta.df$Image_ID) #these are not in the metadata files...
+#length(setdiff(imageNames, meta.df$Image_ID)) #63
+setdiff(imageNames, meta.df.trim$Image_ID) #these are not in the metadata files...
+length(setdiff(imageNames, meta.df.trim$Image_ID)) #71
 
-list.parse <- str_split(list.trim,
-                        pattern = "/")
+meta.image <- meta.df.trim[meta.df.trim$Image_ID %in% imageNames,]
+nrow(meta.image) #7262 
+meta.image$Image_ID[duplicated(meta.image$Image_ID)] #none
 
-#first folder is either Sara (folder name Sara) or Mali (folder names Stegs and Stegs2)
-#subfolder folder, when given, is the formation or grouping
+#### ABOU DATA ----
+#binomials
+meta.image$binomial <- paste0(meta.image$Genus, "_", meta.image$Species)
 
-folder <- c()
-subfolder <- c()
-fileName <- c()
-ext <- c()
+#unique colonies
+meta.image$ID <- paste0(meta.image$Sample_ID, "_", meta.image$Shell_ID, 
+                        "_", meta.image$Colony_ID)
 
-for(i in 1:length(list.parse)){
-  folder[i] <- list.parse[[i]][1]
-  if(isTRUE(endsWith(list.parse[[i]][2], ".txt"))){
-    fileName[i] <- list.parse[[i]][2]
-    subfolder[i] <- "NONE"
-  }
-  else if(isTRUE(endsWith(list.parse[[i]][2], ".tif"))){
-    fileName[i] <- list.parse[[i]][2]
-    subfolder[i] <- "NONE"
-  }
-  else{
-    subfolder[i] <- list.parse[[i]][2]
-    fileName[i] <- list.parse[[i]][3]
-  }
-  if(isTRUE(endsWith(fileName[i], ".txt"))){
-    ext[i] <- "txt"
-  }
-  else{
-    ext[i] <- "tif"
-  }
-}
+##### FIX ERRORS -----
+unique(meta.image$binomial)
+meta.image$binomial[meta.image$binomial == "MIcroporella_speculum"] <- "Microporella_speculum"
+meta.image$binomial[meta.image$binomial == "MIcroporella_agonistes"] <- "Microporella_agonistes"
 
-##### PARSE IMAGE NAME -----
+unique(meta.image$Formation)
+meta.image$Formation[meta.image$Formation == "TAINUI SB"] <- "Tainui Shellbed"
+meta.image$Formation[meta.image$Formation == "Nukumaru Brown Sand"] <- "NKBS"
+meta.image$Formation[meta.image$Formation == "Nukumaru Limestone"] <- "NKLS"
+meta.image$Formation[meta.image$Formation == "TEWKESBURY"] <- "Tewkesbury"
+#waipuru is part of Tewkesbury
+meta.image$Formation[meta.image$Formation == "Waipuru Shellbed"] <- "Tewkesbury"
 
-image.list <- str_split(fileName, pattern = "\\.") #for microporella
+##### TALLY -----
+meta.image.unique <- meta.image[!duplicated(meta.image$ID),]
+nrow(meta.image.unique) #2044
 
-specimenNR <- c()
+#how many of each species
+table(meta.image.unique$binomial)
 
-for(i in 1:length(image.list)){
-  specimenNR[i] <- image.list[[i]][2]
-}
+#how many colonies per species per formation
+table(meta.image.unique$Formation, meta.image.unique$binomial)
 
-##### COMBINE & WRITE CSV ----
-
-df.list <- data.frame(path = listPath,
-                      folder = folder,
-                      subfolder = subfolder,
-                      image = specimenNR,
-                      ext = ext,
-                      fileName = fileName,
-                      specimenNR = specimenNR,
-                      stringsAsFactors = FALSE)
-
-nrow(df.list) 
-nrow(df.list[df.list$ext == "tif",]) #should be half
-sort(table(df.list$specimenNR)) #for microporella
-
-duplicated(df.list$fileName) #should all be FALSE
-
-#### 2. EXTRACT METADATA FROM TXT FILES ----
-
-list.txt <- listPath[!grepl("*.tif",
-                            listPath)]
-length(list.txt)
-
-txtPath <- unlist(list.txt)
-
-
-##### READ TXT FILES -----
-
-txt.df <- data.frame()
-
-for(i in 1:length(txtPath)){
-  f <- read.table(txtPath[i],
-                  sep = "^",
-                  fileEncoding = "UTF-16",
-                  skip = 1)
-  
-  ## now make two columns, using "=" as deliminator
-  
-  ff <- cSplit(f, 'V1',
-               sep = "=",
-               stripWhite = TRUE,
-               type.convert = FALSE)
-  
-  #seems Condition is multiple "="
-  condition <- str_split(ff[ff$V1_1 == "Condition",],
-                         pattern = "\ ")
-  
-  av <- c(condition[[2]][1],condition[[3]][1])
-  mag <- c(condition[[3]][2], condition[[4]][1])
-  wd <- c(condition[[4]][2], condition[[5]][1])
-  lensMode <- c(condition[[5]][2], condition[[6]][1])
-  path <- c("path", txtPath[i])
-  
-  cond.paste <- paste(ff$V1_2[ff$V1_1 == "Condition"], 
-                      ff$V1_3[ff$V1_1 == "Condition"],
-                      ff$V1_4[ff$V1_1 == "Condition"], 
-                      ff$V1_5[ff$V1_1 == "Condition"],
-                      ff$V1_6[ff$V1_1 == "Condition"], 
-                      sep = " ")
-  
-  ff2 <- ff
-  
-  ff2$V1_2[ff2$V1_1 == "Condition"] <- cond.paste
-  
-  ff3 <- ff2[,1:2]
-  
-  ff4 <- rbind(path, as.data.frame(ff3), av, mag, wd, lensMode)
-  
-  names <- ff4$V1_1
-  ff5 <- as.data.frame(t(ff4[,-1]))
-  colnames(ff5) <- names
-  
-  txt.df <- rbind(txt.df, ff5)
-  
-}
-
-nrow(txt.df) #1889
-
-txt.df$fileName <- basename(txt.df$path)
-txt.image.list <- str_split(txt.df$fileName,
-                            pattern = "\\.")
-txt.df$image <- ""
-for(i in 1:length(txt.image.list)){
-  txt.df$image[i] <- txt.image.list[[i]][2]
-}
-
-#### 3. COMBINE IMAGE AND TEXT FILES ----
-## make just images
-df.images <- df.list[df.list$ext == "tif",]
-
-length(setdiff(df.images$fileName, txt.df$ImageName)) #should be none
-length(setdiff(txt.df$ImageName, df.images$fileName)) #should be none
-
-df.image.meta <- merge(df.images, txt.df,
-                       by = "image",
-                       all.x = TRUE, all.y = TRUE)
-nrow(df.image.meta)
-
-colnames(df.image.meta)[colnames(df.image.meta) == 'specimenNR.x'] <- 'specimenNR.tif'
-colnames(df.image.meta)[colnames(df.image.meta) == 'specimenNR.y'] <- 'specimenNR.txt'
-colnames(df.image.meta)[colnames(df.image.meta) == 'fileName.x'] <- 'fileName.tif'
-colnames(df.image.meta)[colnames(df.image.meta) == 'fileName.y'] <- 'fileName.txt'
-colnames(df.image.meta)[colnames(df.image.meta) == 'path.x'] <- 'path.tif'
-colnames(df.image.meta)[colnames(df.image.meta) == 'path.y'] <- 'path.txt'
-
-#### 4. CHECK METADATA AND FILE INFO ----
-## make check in ImageName matches fileName
-df.image.meta$ImageNameCheck <- df.image.meta$fileName.tif == df.image.meta$ImageName
-#check for false
-
-## make check for AV and mag
-# extract numbers only from AV and mag
-
-df.image.meta$magCheck <- df.image.meta$Mag == "x50"
-#check for false
-
-df.image.meta$AVCheck <- df.image.meta$Vacc == "15.0kV"
-#check for false
-
-df.image.meta.trim <- df.image.meta[df.image.meta$magCheck == TRUE,]
-df.image.meta.trim <- df.image.meta.trim[df.image.meta.trim$AVCheck == TRUE,]
-
-##double check no differences in txt file names
-df.list.txt <- df.list[df.list$ext == "txt",]
-setdiff(df.list.txt$fileName, txt.df$fileName)
-setdiff(txt.df$fileName, df.list.txt$fileName)
-# no difference in txt files
-
-
-
+#### WRITE OUT DATA ----
+write.csv(meta.image,
+          "Data/image.metadata.filtered.csv",
+          row.names = FALSE)
+#lost 71 images
