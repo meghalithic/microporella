@@ -6,10 +6,10 @@
 source("Scripts/env.R")
 
 #### LOAD DATA ----
-meta.df <- read.csv("Data/Microporella_SEMs_EDM+Mali_20.09.2022.csv",
+meta.df <- read.csv("Data/Microporella_SEMs_EDM+Mali_05.06.2024.csv",
                     header = TRUE)
 
-images.path <- "../../../../../voje-lab/Desktop/microporella-jpg"
+images.path <- "/home/voje-lab/Desktop/microporella-jpg"
 
 imageNames.jpg = list.files(path = images.path,
                         full.names = TRUE,
@@ -25,11 +25,11 @@ imageNames <- gsub(imageNames.jpg.trim,
 length(imageNames) #7333
 imageNames[duplicated(imageNames)] #none
 
-nrow(meta.df) #8828
+nrow(meta.df) #8860
 dupes <-meta.df$Image_ID[duplicated(meta.df$Image_ID)] #these are repeats
 ######for now, ignore and remove these-------
 meta.df.trim <- meta.df[!(meta.df$Image_ID %in% dupes),]
-nrow(meta.df.trim) #8812
+nrow(meta.df.trim) #8860
 
 #setdiff(imageNames, meta.df$Image_ID) #these are not in the metadata files...
 #length(setdiff(imageNames, meta.df$Image_ID)) #63

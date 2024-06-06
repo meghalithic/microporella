@@ -8,7 +8,7 @@
 source("Scripts/env.R")
 
 #### GET PATH -----
-images.path <- "../../../../../../../media/voje-lab/00C67493C6748AA4/Microporella/"
+images.path <- "/home/voje-lab/Desktop/Microporella"
 
 #### 1. LIST OF FILE NAMES ----
 
@@ -72,9 +72,11 @@ for(i in 1:length(list.parse)){
 image.list <- str_split(fileName, pattern = "\\.") #for microporella
 
 Image_ID <- c()
+specimenNR <- c()
 
 for(i in 1:length(image.list)){
   Image_ID[i] <- paste0(image.list[[i]][1], ".", image.list[[i]][2])
+  specimenNR[i] <- image.list[[i]][2]
 }
 
 ##### COMBINE & WRITE CSV ----
@@ -88,8 +90,8 @@ df.list <- data.frame(path = listPath,
                       Image_ID = Image_ID,
                       stringsAsFactors = FALSE)
 
-nrow(df.list) 
-nrow(df.list[df.list$ext == "tif",]) #should be half
+nrow(df.list) #14694
+nrow(df.list[df.list$ext == "tif",]) #7333 #should be half; have more txt files than images
 sort(table(df.list$Image_ID)) #for microporella
 
 unique(duplicated(df.list$fileName)) #should all be FALSE
@@ -149,10 +151,11 @@ for(i in 1:length(txtPath)){
   colnames(ff5) <- names
   
   txt.df <- rbind(txt.df, ff5)
+  print(paste0(txtPath[i], " ", i))
   
 }
 
-nrow(txt.df) #1889
+nrow(txt.df) #7358
 
 txt.df$fileName <- basename(txt.df$path)
 txt.image.list <- str_split(txt.df$fileName,
@@ -167,7 +170,9 @@ for(i in 1:length(txt.image.list)){
 df.images <- df.list[df.list$ext == "tif",]
 
 length(setdiff(df.images$fileName, txt.df$ImageName)) #should be none
+# missing txt files for 12650 and 6270; fixed manually, they had "tif" in the image name
 length(setdiff(txt.df$ImageName, df.images$fileName)) #should be none
+#missing tif for lots...
 
 df.image.meta <- merge(df.images, txt.df,
                        by = "image",
@@ -196,6 +201,7 @@ df.image.meta$AVCheck <- df.image.meta$Vacc == "15.0kV"
 #check for false
 
 df.image.meta.trim <- df.image.meta[df.image.meta$magCheck == TRUE,]
+#omit any false
 df.image.meta.trim <- df.image.meta.trim[df.image.meta.trim$AVCheck == TRUE,]
 
 nrow(df.image.meta) #7360
