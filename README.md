@@ -32,7 +32,7 @@ We extracted linear measurements from landmarks images of zooids.
 
 There are a total of 22 landmarks, numbered 1 to 22.
 
-![landmarks]()
+![landmarks](Microporella_landmarks.png)
 
 
 Linear measurements were extracted using the landmark coordinates.
