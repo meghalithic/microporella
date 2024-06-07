@@ -1,5 +1,5 @@
 # microporella
-Extraction of traits from morphological modules of *Microporella* species
+Extraction of traits from morphological modules of _Microporella_ species
 
 # Images
 
@@ -28,59 +28,68 @@ The metadata file "[Microporella_SEMs_EDM+Mali_05.06.2024.csv](https://github.co
 
 We extracted linear measurements from landmarks images of zooids.
 
+The example is from [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563) and is of _Microporella discors_.
+
 ## Measurements
 
 There are a total of 22 landmarks, numbered 1 to 22.
 
 ![landmarks](Microporella_landmarks.png)
 
-
 Linear measurements were extracted using the landmark coordinates.
 
 *Traits*
 
-<u>Ovicell<\u> (green shading):
-Shape:
-maximum width: 4O-2O
-maximum length: 1O-3O
-Area?
+**Ovicell** (green shading):
+  Shape:
+    maximum width: 4O-2O
+    maximum length: 1O-3O
+    area
 
-Autozooid (white lines, yellow body):
-shape measurements similar to what we do for Steginoporella magnifica
-zh: 16-9
-oh: height between 6, 7, 8
-Operculum base length: 7-8
-proximal width: 22-10
-distal width: 17-15
-proximal side length: average between 22-19 and 10-13
-distal side length: average between 19-17 and 13-15
-zw: 19-13
+**Autozooid** (yellow shading, white lines):
+  Shape:
+    zooid height: 16-9
+    operculum (pink shading): height between 6, 7, 8
+    operculum base length (pink shading): 7-8
+    proximal width: 22-10
+    distal width: 17-15
+    proximal side length: average between 22-19 and 10-13
+    distal side length: average between 19-17 and 13-15
+    zooid width: 19-13
+    area
 
-Ascopore (black lines, lime green shading):
-position to operculum: proximal-distal position
-position to operculum (right side): 1-7
-position to operculum (left side): 1-8
-position to side wall: relative position
-position to right side wall: 19-1
-position to left side wall: 13-1
-area?
-length? width? 
+**Ascopore** (lime green shading, black lines):
+  Position to operculum: proximal-distal position
+    position to operculum (right side): 1-7
+    position to operculum (left side): 1-8
+  Position to side wall: relative position
+    position to right side wall: 19-1
+    position to left side wall: 13-1
+  Shape:
+    area
 
-Avicularia (grey lines, purple shading):
-shape measurements
-length: 2-5
-height: 3-4
-position to side wall: relative position
-position to left wall: 13-5
-position to right wall: 19-2
-position to operculum: proximal-distal position
-position to operculum (left side): 4-8
-position to operculum (right side): 4-7
-area?
+**Avicularia** (purple shading, grey lines):
+  Shape:
+    length: 2-5
+    height: 3-4
+    area
+  Position to operculum: proximal-distal position
+    position to operculum (left side): 4-8
+    position to operculum (right side): 4-7
+  Position to side wall: relative position
+    position to left wall: 13-5
+    position to right wall: 19-2
 
 # Automation
 
-A. Porto created [Steginator](https://github.com/agporto/Steginator), which links [DeepBryo](https://deepbryo.ngrok.io/), a tool developed by [DiMartino et al.](https://www.biorxiv.org/content/early/2022/11/17/2022.11.17.516938) that segments out zooids from a colony, and [ML-morph](https://github.com/agporto/ml-morph), a tool developed by [Porto & Voje](https://doi.org/10.1111/2041-210X.13373) to automatically place landmarks on images.
+We use two steps for gathering linear measurements:
+
+1. [DeepBryo](https://github.com/agporto/DeepBryo/), a tool developed by [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563) and which we forked for our project ([DeepBryo_micro](https://github.com/megbalk/DeepBryo_micro))
+  - this provides segmentation of morphological features of _Microporella_ colonies
+  - the program also extracts area
+
+2.  [ML-morph[(https://github.com/agporto/ml-morph) a tool developed by [Porto & Voje 2020](https://doi.org/10.1111/2041-210X.13373) and forked for our project ([ml-morph_micro](https://github.com/megbalk/ml-morph_micro))
+   - this tool automatically places landmarks on images after a bit of training
 
 The output of the machine learning pipeline is a csv file of:
 - id of the image (specimenNR_NR of pics_AV_magnification_backscatter)
@@ -94,6 +103,6 @@ The output of the machine learning pipeline is a csv file of:
 
 # Data processing
 
-In the code, "[fileNames.R](https://github.com/megbalk/magnifica/blob/main/fileNames.R)", reads in the image names and associated metadata file name and creates the dataset, "[imageList.csv](https://github.com/megbalk/magnifica/blob/main/imageList.csv)". This list retains information about the file structure, parses the image name into the same parts as the "Imaged Steginoporella magnifica specimens.csv", and notes the extension of the data item.
+We check the metadata for every image in the scripts [microporella_imageMetadata.R](https://github.com/megbalk/microporella/blob/main/Scripts/microporella_imageMetadata.R) and [microporella_metadata.R](https://github.com/megbalk/microporella/blob/main/Scripts/microporella_metadata.R) to restrict images that have the same magnification (x50) and remove any duplicates.
 
-The code also checks for discrepencies being the imaging metadata, "Imaged Steginoporella magnifica specimens.csv", and the list of images.
+In the code, "[fileNames.R](https://github.com/megbalk/microporella/blob/main/Scripts/filterImages.R)", reads in the image names and associated metadata file name and creates the dataset, "[image.filter.csv](https://github.com/megbalk/microporella/blob/main/Data/image.filter.csv)".
