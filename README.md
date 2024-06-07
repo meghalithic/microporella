@@ -42,8 +42,8 @@ Linear measurements were extracted using the landmark coordinates.
 
 **Ovicell** (green shading):  
 &ensp;Shape:  
-&ensp;&ensp;maximum width: 4O-2O  
-&ensp;&ensp;maximum length: 1O-3O  
+&ensp;&ensp;maximum width: 4<sub>O</sub>-2<sub>O</sub>  
+&ensp;&ensp;maximum length: 1<sub>O</sub>-3<sub>O</sub>  
 &ensp;&ensp;area
 
 **Autozooid** (yellow shading, white lines):  
