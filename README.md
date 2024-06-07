@@ -40,45 +40,45 @@ Linear measurements were extracted using the landmark coordinates.
 
 *Traits*
 
-**Ovicell** (green shading):
-  Shape:
-    maximum width: 4O-2O
-    maximum length: 1O-3O
-    area
+**Ovicell** (green shading):  
+&ensp;Shape:  
+&ensp;&ensp;maximum width: 4O-2O  
+&ensp;&ensp;maximum length: 1O-3O  
+&ensp;&ensp;area
 
-**Autozooid** (yellow shading, white lines):
-  Shape:
-    zooid height: 16-9
-    operculum (pink shading): height between 6, 7, 8
-    operculum base length (pink shading): 7-8
-    proximal width: 22-10
-    distal width: 17-15
-    proximal side length: average between 22-19 and 10-13
-    distal side length: average between 19-17 and 13-15
-    zooid width: 19-13
-    area
+**Autozooid** (yellow shading, white lines):  
+&ensp;Shape:  
+&ensp;&ensp;zooid height: 16-9  
+&ensp;&ensp;operculum (pink shading): height between 6, 7, 8  
+&ensp;&ensp;operculum base length (pink shading): 7-8  
+&ensp;&ensp;proximal width: 22-10  
+&ensp;&ensp;distal width: 17-15  
+&ensp;&ensp;proximal side length: average between 22-19 and 10-13  
+&ensp;&ensp;distal side length: average between 19-17 and 13-15  
+&ensp;&ensp;zooid width: 19-13  
+&ensp;&ensp;area
 
-**Ascopore** (lime green shading, black lines):
-  Position to operculum: proximal-distal position
-    position to operculum (right side): 1-7
-    position to operculum (left side): 1-8
-  Position to side wall: relative position
-    position to right side wall: 19-1
-    position to left side wall: 13-1
-  Shape:
-    area
+**Ascopore** (lime green shading, black lines):  
+&ensp;Shape:  
+&ensp;&ensp;area  
+&ensp;Position to operculum: proximal-distal position  
+&ensp;&ensp;position to operculum (right side): 1-7  
+&ensp;&ensp;position to operculum (left side): 1-8  
+&ensp;Position to side wall: relative position  
+&ensp;&ensp;position to right side wall: 19-1  
+&ensp;&ensp;position to left side wall: 13-1
 
-**Avicularia** (purple shading, grey lines):
-  Shape:
-    length: 2-5
-    height: 3-4
-    area
-  Position to operculum: proximal-distal position
-    position to operculum (left side): 4-8
-    position to operculum (right side): 4-7
-  Position to side wall: relative position
-    position to left wall: 13-5
-    position to right wall: 19-2
+**Avicularia** (purple shading, grey lines):  
+&ensp;Shape:  
+&ensp;&ensp;length: 2-5  
+&ensp;&ensp;height: 3-4  
+&ensp;&ensp;area  
+&ensp;Position to operculum: proximal-distal position  
+&ensp;&ensp;position to operculum (left side): 4-8  
+&ensp;&ensp;position to operculum (right side): 4-7  
+&ensp;Position to side wall: relative position  
+&ensp;&ensp;position to left wall: 13-5  
+&ensp;&ensp;position to right wall: 19-2
 
 # Automation
 
