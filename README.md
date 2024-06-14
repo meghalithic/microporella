@@ -34,6 +34,8 @@ The example is from [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563)
 
 There are a total of 22 landmarks, numbered 1 to 14, 1<sub>O</sub> to 4<sub>O</sub>, and 1<sub>A</sub> to 1<sub>A</sub>.
 
+The measurements were based off [Di Martino & Liow 2022](https://doi.org/10.1111/evo.14598) and [Schack et al. 2020](https://www.jstor.org/stable/26937017).
+
 *Landmarks*
 
 ![landmarks](Microporella_landmarks.png)
