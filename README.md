@@ -28,9 +28,7 @@ The metadata file "[Microporella_SEMs_EDM+Mali_05.06.2024.csv](https://github.co
 
 We extracted linear measurements from landmarks images of zooids.
 
-The example is from [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563) and is of _Microporella discors_.
-
-## Measurements
+The image below is from [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563) and is of _Microporella discors_.
 
 There are a total of 22 landmarks, numbered 1 to 14, 1<sub>O</sub> to 4<sub>O</sub>, and 1<sub>A</sub> to 1<sub>A</sub>.
 
@@ -68,7 +66,7 @@ The measurements were based off [Di Martino & Liow 2022](https://doi.org/10.1111
 - 3<sub>A</sub>: proximal end along midline
 - 4<sub>A</sub>: right side along midline
 
-*Traits*
+*Measurements*
 
 Linear measurements were extracted using the landmark coordinates.
 
