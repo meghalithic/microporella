@@ -34,10 +34,13 @@ nrow(meta.df.trim) #8860
 #setdiff(imageNames, meta.df$Image_ID) #these are not in the metadata files...
 #length(setdiff(imageNames, meta.df$Image_ID)) #63
 setdiff(imageNames, meta.df.trim$Image_ID) #these are not in the metadata files...
-length(setdiff(imageNames, meta.df.trim$Image_ID)) #71
+length(setdiff(imageNames, meta.df.trim$Image_ID)) #18
+imageNames <- gsub("[(]x50[)]", 
+                    "",
+          imageNames)
 
-meta.image <- meta.df.trim[meta.df.trim$Image_ID %in% imageNames,]
-nrow(meta.image) #7262 
+meta.image <- meta.df.trim[meta.df.trim$Image_ID %in% imageNames,] #just ignoring 10575 for now
+nrow(meta.image) #7332 
 meta.image$Image_ID[duplicated(meta.image$Image_ID)] #none
 
 #### ABOU DATA ----
@@ -53,6 +56,10 @@ unique(meta.image$binomial)
 meta.image$binomial[meta.image$binomial == "MIcroporella_speculum"] <- "Microporella_speculum"
 meta.image$binomial[meta.image$binomial == "MIcroporella_agonistes"] <- "Microporella_agonistes"
 
+#remove species 
+keep <- c("Microporella_agonistes", "Microporella_discors", "Microporella_intermedia", "Microporella_speculum")
+meta.image <- meta.image[meta.image$binomial %in% keep,]
+
 unique(meta.image$Formation)
 meta.image$Formation[meta.image$Formation == "TAINUI SB"] <- "Tainui Shellbed"
 meta.image$Formation[meta.image$Formation == "Nukumaru Brown Sand"] <- "NKBS"
@@ -63,7 +70,7 @@ meta.image$Formation[meta.image$Formation == "Waipuru Shellbed"] <- "Tewkesbury"
 
 ##### TALLY -----
 meta.image.unique <- meta.image[!duplicated(meta.image$ID),]
-nrow(meta.image.unique) #2044
+nrow(meta.image.unique) #2047
 
 #how many of each species
 table(meta.image.unique$binomial)
@@ -75,4 +82,4 @@ table(meta.image.unique$Formation, meta.image.unique$binomial)
 write.csv(meta.image,
           "Data/image.metadata.filtered.csv",
           row.names = FALSE)
-#lost 71 images
+

@@ -15,25 +15,28 @@ image.df <- read.csv("Data/image.imageMetadata.filtered.csv",
 head(meta.image$Image_ID)
 head(image.df$Image_ID)
 
-nrow(meta.image) #7262
-nrow(image.df) #7324
+nrow(meta.image) #6593
+nrow(image.df) #7360
 
-length(setdiff(meta.image$Image_ID, image.df$Image_ID)) #13
-length(setdiff(image.df$Image_ID, meta.image$Image_ID)) #72
-#going to lose 85 images (total 192 from all other filtering scripts)
+length(setdiff(meta.image$Image_ID, image.df$Image_ID)) #17; 0 after I fix names
+length(setdiff(image.df$Image_ID, meta.image$Image_ID)) #lots, likely because I have a lot of images of non-focal species0000
+
+image.df$Image_ID <- gsub("[(]x50[)]", 
+                          "",
+                          image.df$Image_ID)
 
 meta.image.trim <- meta.image[meta.image$Image_ID %in% image.df$Image_ID,]
-nrow(meta.image.trim) #7249
+nrow(meta.image.trim) #6593
 image.trim <- image.df[image.df$Image_ID %in% meta.image$Image_ID,]
-nrow(image.trim) #7249
+nrow(image.trim) #6593
 
 filter.df <- merge(image.trim, meta.image.trim,
                    by = "Image_ID")
-nrow(filter.df) #7249
+nrow(filter.df) #6593
 
 #### TALLY ----
 filter.unique <- filter.df[!duplicated(filter.df$ID),]
-nrow(filter.unique) #2038
+nrow(filter.unique) #1876
 
 #how many of each species
 table(filter.unique$binomial)
@@ -46,4 +49,10 @@ write.csv(filter.df,
           "Data/image.filter.csv",
           row.names = FALSE)
 
+#### WRITE OUT LIST OF IMAGES NOT AT x50 ----
+non50 <- filter.df[filter.df$magCheck == FALSE,]
+non50$Mag
+write.csv(non50,
+          "Data/image.filter.non50mag.csv",
+          row.names = FALSE)
 

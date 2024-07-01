@@ -8,7 +8,7 @@
 source("Scripts/env.R")
 
 #### GET PATH -----
-images.path <- "/home/voje-lab/Desktop/Microporella"
+images.path <- "/home/voje-lab/Desktop/microporella"
 
 #### 1. LIST OF FILE NAMES ----
 
@@ -155,7 +155,7 @@ for(i in 1:length(txtPath)){
   
 }
 
-nrow(txt.df) #7358
+nrow(txt.df) #7360
 
 txt.df$fileName <- basename(txt.df$path)
 txt.image.list <- str_split(txt.df$fileName,
@@ -173,6 +173,10 @@ length(setdiff(df.images$fileName, txt.df$ImageName)) #should be none
 # missing txt files for 12650 and 6270; fixed manually, they had "tif" in the image name
 length(setdiff(txt.df$ImageName, df.images$fileName)) #should be none
 #missing tif for lots...
+txt.df$ImageName[txt.df$ImageName == "MHR.6270tif.tif"] <- "MHR.6270.tif"
+
+txt.df$ImageName[txt.df$ImageName == "MHR.12650tif.tif"] <- "MHR.12650.tif"
+
 
 df.image.meta <- merge(df.images, txt.df,
                        by = "image",
@@ -190,22 +194,25 @@ colnames(df.image.meta)[colnames(df.image.meta) == 'path.y'] <- 'path.txt'
 ## make check in ImageName matches fileName
 df.image.meta$ImageNameCheck <- df.image.meta$fileName.tif == df.image.meta$ImageName
 #check for false
+df.image.meta$ImageName[df.image.meta$ImageNameCheck == FALSE] 
+#error in file name, the rest are the ones likely missing tif files (equals same number as above)
 
 ## make check for AV and mag
 # extract numbers only from AV and mag
 
 df.image.meta$magCheck <- df.image.meta$Mag == "x50"
 #check for false
+df.image.meta[df.image.meta$magCheck == FALSE,] 
 
 df.image.meta$AVCheck <- df.image.meta$Vacc == "15.0kV"
 #check for false
 
-df.image.meta.trim <- df.image.meta[df.image.meta$magCheck == TRUE,]
+#df.image.meta.trim <- df.image.meta[df.image.meta$magCheck == TRUE,]
 #omit any false
-df.image.meta.trim <- df.image.meta.trim[df.image.meta.trim$AVCheck == TRUE,]
+#df.image.meta.trim <- df.image.meta.trim[df.image.meta.trim$AVCheck == TRUE,]
 
 nrow(df.image.meta) #7360
-nrow(df.image.meta.trim)#7324, only lost 36 images
+#nrow(df.image.meta.trim)#7324, only lost 36 images
 
 ##double check no differences in txt file names
 df.list.txt <- df.list[df.list$ext == "txt",]
@@ -215,7 +222,7 @@ setdiff(txt.df$fileName, df.list.txt$fileName)
 
 #### WRITE CSV ----
 #these are the images to use for ML
-write.csv(df.image.meta.trim,
+write.csv(df.image.meta,
           "Data/image.imageMetadata.filtered.csv",
           row.names = FALSE)
 #lost 36 images
