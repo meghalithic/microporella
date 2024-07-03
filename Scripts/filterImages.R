@@ -1,6 +1,10 @@
 #This script combines filtering steps from microporella_imageMetadta and 
 #microporella_metadata for a list of images that we will use for ML.
 
+#went through images manually
+#hese filter files are to make sure that no images are included that shouldnt be
+#and also that we have all the metadata for the images
+
 #### ENVIRONMENT ----
 source("Scripts/env.R")
 
