@@ -4,7 +4,7 @@ MHR.5648,cracks
 MHR.5803,
 MHR.5804,
 MHR.5806,other species on lower right
-MHR.5817,other stuff
+MHR.5817,other stuff - maybe omit
 MHR.5822,"rocks detected as ovicells, issue on github"
 MHR.6449,
 MHR.6457,
@@ -49,3 +49,29 @@ MHR.12099,cracks
 MHR.12363,cracks
 MHR.12370,"seagrass, broken"
 MHR.12449,other taxa
+MHR.5649,Masks affected
+MHR.5982,Top right rock detected as orifice with zooid
+MHR.5985,Other species on left
+MHR.6459,Holes/rocks detected as zooids/orifice
+MHR.6563,Zooids along edge distorted
+MHR.6564,"Autozooid 7 distorted, object 31 and 38 are holes"
+MHR.6574,Some zooids cut in half or distorted
+MHR.6575,Some zooids cut in half or distorted
+MHR.6607,Some zooids cut in half or distorted
+MHR.7073,Zooids cut in half by angle. Dirt in orifice 58 makes mask tiny
+MHR.7123,
+MHR.7384,Bottom row of zooid masks cut in half
+MHR.7183,Other species top right
+MHR.7430,Right fourth of zooids distorted
+MHR.7433,"Top half distorted, orifice 42 is a hole"
+MHR.7649,"Top edge row distorted, calcification affects masks in lower middle of image"
+MHR.7650,"Top row distorted, calcification affects masks in lower middle of image"
+MHR.8083,"Holes detected as avicularia (nr 51 & 52), hole detected as zooids with features (nr 7)"
+MHR.7436,left side distorted
+MHR.7948,Half of zooid 8 is detected as part of nr 16
+MHR.8415,Non-bryozoa detected as zooids
+MHR.8612,"Other species, few zooids - maybe omit"
+MHR.8814,
+MHR.9899,
+MHR.10603,Other species at top
+MHR.10734,Other species at top
