@@ -38,7 +38,7 @@ The measurements were based off [Di Martino & Liow 2022](https://doi.org/10.1111
 
 *Landmarks*
 
-![landmarks](Microporella landmarks.png)
+![landmarks](Microporella_landmarks.png)
 
 **Ovicell** (green shading):  
 - 1<sub>V</sub>: centroid
