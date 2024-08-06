@@ -24,6 +24,8 @@ The metadata file "[Microporella_SEMs_EDM+Mali_05.06.2024.csv](https://github.co
 - Genus: genus of the binomial
 - Species: species of the binomial
 
+We also compared the images to those used in [Liow et al. 2024](https://doi.org/10.1086/731332) (see [dataset here](https://github.com/meghalithic/bryo_metadata/blob/main/metadata/Microporella_SELECT_final_datasets_26.01.2023.xlsx))
+
 # Traits
 
 We extracted linear measurements from landmarks images of zooids.
@@ -36,103 +38,82 @@ The measurements were based off [Di Martino & Liow 2022](https://doi.org/10.1111
 
 *Landmarks*
 
-![landmarks](Microporella_landmarks.png)
+![landmarks](Microporella landmarks.png)
 
 **Ovicell** (green shading):  
-- 1<sub>O</sub>: distal end along midline
-- 2<sub>O</sub>: left side along midline
-- 3<sub>O</sub>: proximal end along midline
-- 4<sub>O</sub>: right side along midline
+- 1<sub>V</sub>: centroid
 
 **Autozooid** (yellow shading):  
-- 1: center of ascopore
-- 2: distal end of operculum along midline
-- 3: right side of operculum at base
-- 4: left side of operculum at base
-- 5: proximal end along midline
-- 6: left proximal end connection point with adjacent zooids
-- 7: left proximal side at widest point, also a connection point between adjacent zooids
-- 8: left distal side in line with base of operculum
-- 9: left distal end connection point with adjacent zooids
-- 10: distal end along midline
-- 11: right distal end connection point with adjacent zooids
-- 12: right distal side in line with base of operculum
-- 13: right proximal side at widest point, also a connection point between adjacent zooids
-- 14: right proximal end connection point with adjacent zooids
+- 1<sub>U</sub>: centroid
+  
+**Ascopore** (lime green shading):  
+- 1<sub>P</sub>: centroid
+
+**Operculum** (pink shading):  
+- 1<sub>O</sub>: centroid
 
 **Avicularia** (purple shading):  
-- 1<sub>A</sub>: distal end along midline
-- 2<sub>A</sub>: left side along midline
-- 3<sub>A</sub>: proximal end along midline
-- 4<sub>A</sub>: right side along midline
+- 1<sub>A</sub>: centroid
 
 *Measurements*
 
-Linear measurements were extracted using the landmark coordinates.
+Linear measurements were extracted using dimensions of the mask (see [DeepBryo_micro](https://github.com/meghalithic/DeepBryo_micro)).
 
 **Ovicell** (green shading):  
 &ensp;Shape:  
-&ensp;&ensp;maximum width: 4<sub>O</sub>-2<sub>O</sub>  
-&ensp;&ensp;maximum length: 1<sub>O</sub>-3<sub>O</sub>  
+&ensp;&ensp;maximum width  
+&ensp;&ensp;maximum length  
 &ensp;&ensp;area
 
-**Autozooid** (yellow shading, white lines):  
+**Autozooid** (yellow shading):  
 &ensp;Shape:  
-&ensp;&ensp;zooid height: 10-5  
-&ensp;&ensp;operculum (pink shading): height between 2, 3, 4  
-&ensp;&ensp;operculum base length (pink shading): 3-4  
-&ensp;&ensp;proximal width: 14-6  
-&ensp;&ensp;distal width: 11-9  
-&ensp;&ensp;proximal side length: average between 13-14 and 6-7  
-&ensp;&ensp;distal side length: average between 13-11 and 7-9  
-&ensp;&ensp;zooid width: 13-7  
+&ensp;&ensp;zooid length (height)  
+&ensp;&ensp;zooid width  
 &ensp;&ensp;area
 
 **Ascopore** (lime green shading, black lines):  
 &ensp;Shape:  
 &ensp;&ensp;area  
-&ensp;Position to operculum: proximal-distal position  
-&ensp;&ensp;position to operculum (right side): 1-3  
-&ensp;&ensp;position to operculum (left side): 1-4  
-&ensp;Position to side wall: relative position  
-&ensp;&ensp;position to right side wall: 13-1  
-&ensp;&ensp;position to left side wall: 7-1
+&ensp;Position on autozooid  
+&ensp;&ensp;distance from distal wall (intersection between vertical midline of ascopore mask and autozooid mask)  
+&ensp;&ensp;distance from lateral wall (intersection between horizontal midline of aspcopore mask and autozooid mask)
+
+**Operculum** (pink shading):  
+&ensp;Shape:  
+&ensp;&ensp;area  
+&ensp;&ensp;length  
+&ensp;&ensp;width  
+&ensp;Amount covered by ovicell
 
 **Avicularia** (purple shading):  
 &ensp;Shape:  
-&ensp;&ensp;length: 2<sub>A</sub>-4<sub>A</sub>  
-&ensp;&ensp;height: 1<sub>A</sub>-3<sub>A</sub>  
+&ensp;&ensp;length  
+&ensp;&ensp;height  
 &ensp;&ensp;area  
-&ensp;Position to operculum: proximal-distal position  
-&ensp;&ensp;position to operculum (left side): 2<sub>A</sub>-7  
-&ensp;&ensp;position to operculum (right side): 2<sub>A</sub>-13  
-&ensp;Position to side wall: relative position  
-&ensp;&ensp;position to left wall: 1<sub>A</sub>-4  
-&ensp;&ensp;position to right wall: 1<sub>A</sub>-3
+&ensp;Position on autozooid  
+&ensp;&ensp;distance from distal wall (intersection between vertical midline of avicularium mask and autozooid mask)  
+&ensp;&ensp;distance from lateral wall (intersection between horizontal midline of avicularium mask and autozooid mask
 
 # Automation
 
-We use two steps for gathering linear measurements:
+We use [DeepBryo](https://github.com/agporto/DeepBryo/), a tool developed by [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563) and which we forked for our project ([DeepBryo_micro](https://github.com/megbalk/DeepBryo_micro)), to extract measurements. This code provides segmentation of morphological features of _Microporella_ colonies. We modified the code to also output minimum bounding box and polygon coordinates to: extract relative position of avicularia and ascopores on autozooids, match masks of the ascopore, avicularia, operculum, and ovicell to the autozooid, check for any errors in segementation.
 
-1. [DeepBryo](https://github.com/agporto/DeepBryo/), a tool developed by [Di Martino et al. 2023](https://doi.org/10.1002/lom3.10563) and which we forked for our project ([DeepBryo_micro](https://github.com/megbalk/DeepBryo_micro))
-  - this provides segmentation of morphological features of _Microporella_ colonies
-  - the program also extracts area
-
-2.  [ML-morph](https://github.com/agporto/ml-morph) a tool developed by [Porto & Voje 2020](https://doi.org/10.1111/2041-210X.13373) and forked for our project ([ml-morph_micro](https://github.com/megbalk/ml-morph_micro))
-   - this tool automatically places landmarks on images after a bit of training
-
-The output of the machine learning pipeline is a csv file of:
-- id of the image (specimenNR_NR of pics_AV_magnification_backscatter)
-- box_id, a unique identifier for the zooid in the image (box_top_box_left_box_width_box_height)
-- box_top
-- box_left
-- box_width
-- box_height
-- Xn cooridnate, where n corresponds to the landmark number for landmarks 0-22
-- Yn coordinate, where n corresponds to the landmark number for landmarks 0-22
+The output of the machine learning pipeline is a csv file of (trimmed to the columns of interest):
+- index of the structure id
+- image_id: image name
+- category: type of structure (i.e., autozooid, ascopore, operculum, avicularia, or ovicell)
+- area: area of mask
+- circularity
+- majorAxis: height of structure
+- minorAxis: width of structure
+- center_x: x-axis for centroid
+- center_y: y-axis for centroid
+- polygon: json of polygon vertices
+- min_bbox_points: bbox coordinates for top, left, bottom, right
+- unit: if pixels or scaled
 
 # Data processing
 
-We check the metadata for every image in the scripts [microporella_imageMetadata.R](https://github.com/megbalk/microporella/blob/main/Scripts/microporella_imageMetadata.R) and [microporella_metadata.R](https://github.com/megbalk/microporella/blob/main/Scripts/microporella_metadata.R) to restrict images that have the same magnification (x50) and remove any duplicates.
+We check the metadata for every image in the scripts [microporella_imageMetadata.R](https://github.com/megbalk/microporella/blob/main/Scripts/microporella_imageMetadata.R) and [microporella_metadata.R](https://github.com/megbalk/microporella/blob/main/Scripts/microporella_metadata.R). (See [note on processing](https://github.com/meghalithic/microporella/issues/5))
 
 In the code, "[fileNames.R](https://github.com/megbalk/microporella/blob/main/Scripts/filterImages.R)", reads in the image names and associated metadata file name and creates the dataset, "[image.filter.csv](https://github.com/megbalk/microporella/blob/main/Data/image.filter.csv)".
