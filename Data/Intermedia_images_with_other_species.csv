@@ -3,7 +3,6 @@ MHR.6872,,M.intermedia-scalebar-left
 MHR.8057,,M.intermedia-scalebar-left
 MHR.8060,,M.intermedia-scalebar-left
 MHR.8159,,M.intermedia-scalebar-left
-MHR.8277,,M.intermedia-scalebar-left
 MHR.6777,,M.intermedia-scalebar-left
 MHR.7389,Other issues – debris,M.intermedia-scalebar-left
 MHR.7890,,M.intermedia-scalebar-left
@@ -12,7 +11,6 @@ MHR.4633,,M.intermedia-scalebar-bottom
 MHR.6558,,M.intermedia-scalebar-bottom
 MHR.6559,,M.intermedia-scalebar-bottom
 MHR.6584,,M.intermedia-scalebar-bottom
-MHR.6895,,M.intermedia-scalebar-bottom
 MHR.7146,Hole detected as zooid with orifice,M.intermedia-scalebar-bottom
 MHR.7248,,M.intermedia-scalebar-bottom
 MHR.7279,,M.intermedia-scalebar-bottom
@@ -28,48 +26,95 @@ MHR.8156,Non-bryozoa detected as zooid with feature,M.intermedia-scalebar-bottom
 MHR.8387,Other species upper left,M.intermedia-scalebar-bottom
 MHR.8483,Non-bryozoa detected as zooid with feature,M.intermedia-scalebar-bottom
 MHR.6638,Non-bryozoa detected as zooid with feature,M.intermedia-scalebar-right
-MHR.6765,Calcification,M.intermedia-scalebar-right
-MHR.6795,Calcification,M.intermedia-scalebar-right
 MHR.6830,,M.intermedia-scalebar-right
-MHR.6887,Calcification,M.intermedia-scalebar-right
 MHR.7024,Are the bottom left other species eg discors?,M.intermedia-scalebar-right
-MHR.7208,Calcification,M.intermedia-scalebar-right
 MHR.7261,,M.intermedia-scalebar-right
 MHR.7476,Other species top left not detected but rocks detected as zooids,M.intermedia-scalebar-right
 MHR.7845,Non-bryozoa detected as part of zooid,M.intermedia-scalebar-right
 MHR.7932,Non-bryozoa detected as feature,M.intermedia-scalebar-right
 MHR.8280,Non-bryozoa detected as zooid,M.intermedia-scalebar-right
 MHR.12605,Other species top,M.intermedia-scalebar-right
-MHR.6560,Other species top,M.intermedia-scalebar-right
 MHR.4668,Crack in zooid. Non-bryo detected as zooid with feature. Calcif.,M.intermedia-scalebar-top
-MHR.6762,Non-bryozoa detected as zooid with feature,M.intermedia-scalebar-top
-MHR.6763,Other species top left,M.intermedia-scalebar-top
 MHR.6825,Other species middle right,M.intermedia-scalebar-top
 MHR.6831,Other species top left and other taxa affecting masks nr. 12 and 18.,M.intermedia-scalebar-top
 MHR.6869,Non-bryozoa detected as zooids with feature and ovicell,M.intermedia-scalebar-top
 MHR.6960,Non-bryozoa detected as zooids with feature,M.intermedia-scalebar-top
-MHR.7206,Non-bryozoa detected as zooids with feature,M.intermedia-scalebar-top
-MHR.7206,Calcif and angle distorting masks,M.intermedia-scalebar-top
+MHR.7206,"Non-bryozoa detected as zooids with feature, Calcif and angle distorting masks ",M.intermedia-scalebar-top
 MHR.7303,,M.intermedia-scalebar-top
 MHR.7451,Other species lower right,M.intermedia-scalebar-top
-MHR.7638,Other species lower left,M.intermedia-scalebar-top
 MHR.7848,"Mask 23 is other species, ovicells misdetected",M.intermedia-scalebar-top
-MHR.7853,,M.intermedia-scalebar-top
 MHR.7849,Other taxa detected as zooids with features also ancestrula,M.intermedia-scalebar-top
 MHR.7863,Calcification,M.intermedia-scalebar-top
 MHR.7933,Non-bryozoa detected as zooid,M.intermedia-scalebar-top
-MHR.7967,Cracks cut masks in half for zooids nr 18 and 21,M.intermedia-scalebar-top
 MHR.8275,Non-bryozoa detected as zooid with features,M.intermedia-scalebar-top
-MHR.12745,Other species top left not detected but calcif.,M.intermedia-scalebar-top
 MHR.12746,Non-bryo detected as zooid. Calcif,M.intermedia-scalebar-top
 MHR.12794,Left maybe not same species. Ancestrula,M.intermedia-scalebar-top
 MHR.6827,,M.intermedia-scalebar-top
 MHR.6862,,
 MHR.7471,,
-MHR.7451,,
 MHR.7614,Other species and non-bryo detected as zooid with features,
 MHR.8158,,M.intermedia-scalebar-top
 MHR.8260,,
 MHR.8251,,
 MHR.12675,,
 MHR.12793,"Other species etc detected as zooid top right, ancestrula",M.intermedia-scalebar-left
+edm8165,,
+edm8169,,
+edm8172,,
+edm8252,,
+edm8253,,
+edm8263,,
+edm8264,,
+edm8296,,
+edm8347,,
+edm8348,,
+edm8375,,
+edm8376,,
+edm8377,,
+edm8378,,
+edm8457,,
+edm8458,,
+edm8511,,
+edm8512,,
+edm8513,,
+edm8534,,
+edm8540,,
+edm8541,,
+edm8550,,
+edm8579,,
+edm8644,,
+edm8645,,
+MHR.7997,,
+MHR.7998,,
+MHR.4469,,
+MHR.6637,,
+MHR.6870,,
+MHR.6962,,
+MHR.7283,,
+MHR.7285,,
+MHR.7365,,
+MHR.7366,,
+MHR.7454,,
+MHR.7465,,
+MHR.7860,,
+MHR.7886,,
+MHR.7887,,
+MHR.7893,,
+MHR.7904,,
+MHR.8037,,
+MHR.8038,,
+MHR.7395,,
+MHR.8332,,
+MHR.12622,,
+MHR.6668,,
+MHR.6838,,
+MHR.6964,,
+MHR.7909,,
+MHR.6961,,
+MHR.7511,,
+MHR.6667,,
+MHR.7449,,
+MHR.7550,,
+MHR.7859,,
+MHR.7901,,
+MHR.8572,,
