@@ -24,6 +24,8 @@ require(data.table)
 require(Hmisc)
 library(scales)
 
+source("Scripts/maha.R")
+
 plot.theme <- theme(text = element_text(size = 16),
                     legend.position = "none",
                     panel.grid.major = element_blank(), 
@@ -810,6 +812,11 @@ ggsave(p.pick.int.auto.area,
        file = "./Results/summer_student_project/pick.auto.area.png", 
        width = 14, height = 10, units = "cm")
 
+ks.test(log(df.int.comp$area[df.int.comp$treatment == "Manual" 
+                             & df.int.comp$category == "autozooid"]), 
+        log(df.int.comp$area[df.int.comp$treatment == "CLI"
+                             & df.int.comp$category == "autozooid"])) #nonsig
+
 #LENGTH
 p.pick.int.auto.len <- df.int.comp %>%
     filter(category == "autozooid") %>%
@@ -867,6 +874,11 @@ p.pick.int.ori.area <- df.int.comp %>%
 ggsave(p.pick.int.ori.area, 
        file = "./Results/summer_student_project/pick.ori.area.png", 
        width = 14, height = 10, units = "cm")
+
+ks.test(log(df.int.comp$area[df.int.comp$treatment == "Manual" 
+                             & df.int.comp$category == "orifice"]), 
+        log(df.int.comp$area[df.int.comp$treatment == "CLI"
+                             & df.int.comp$category == "orifice"])) #sig!
 
 #LENGTH
 p.pick.int.ori.len <- df.int.comp %>%
@@ -926,6 +938,11 @@ ggsave(p.pick.int.avic.area,
        file = "./Results/summer_student_project/pick.avic.area.png", 
        width = 14, height = 10, units = "cm")
 
+ks.test(log(df.int.comp$area[df.int.comp$treatment == "Manual" 
+                             & df.int.comp$category == "avicularium"]), 
+        log(df.int.comp$area[df.int.comp$treatment == "CLI"
+                             & df.int.comp$category == "avicularium"])) #nonsig
+
 #LENGTH
 p.pick.int.avic.len <- df.int.comp %>%
     filter(category == "avicularium") %>%
@@ -983,6 +1000,11 @@ p.pick.int.ovi.area <- df.int.comp %>%
 ggsave(p.pick.int.ovi.area, 
        file = "./Results/summer_student_project/pick.ovi.area.png", 
        width = 14, height = 10, units = "cm")
+
+ks.test(log(df.int.comp$area[df.int.comp$treatment == "Manual" 
+                             & df.int.comp$category == "ovicell"]), 
+        log(df.int.comp$area[df.int.comp$treatment == "CLI"
+                             & df.int.comp$category == "ovicell"])) #nonsig
 
 #LENGTH
 p.pick.int.ovi.len <- df.int.comp %>%
@@ -1604,9 +1626,147 @@ ggsave(p.rot.ovi.wid,
 
 #### TEST OUTLIER DETECTION ----
 ## using intermedia as an example
+#df.cli.int
+#remove edm because at different magnicifaction
+unique(df.cli.int$image_id)
+rm.edm <- c("edm8146", "edm8147", "edm8148", "edm8160", "edm8170",
+            "edm8173", "edm8261", "edm8329", "edm8330", "edm8331",
+            "edm8332", "edm8459", "edm8460", "edm8510", "edm8528",
+            "edm8529", "edm8530", "edm8535", "edm8539", "edm8542",
+            "edm8543", "edm8551", "edm8552", "edm8580", "edm8581", 
+            "edm8584", "edm8640", "edm8641", "edm8642", "edm8643",
+            "edm8646", "edm8647", "edm8648", "edm9268")
+df.cli.int.trim <- df.cli.int[!(df.cli.int$image_id %in% rm.edm),]
 
-#see if can use to detect weird things
 
+#it is failing to catch the small autozooids
+df.cli.int.trim %>%
+    filter(category == "autozooid") %>%
+    ggplot(aes(x = log(area))) +
+    #geom_histogram(bins = 15) + 
+    geom_histogram(bins = 30) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Area~(mu*m^2)))
+
+df.cli.int.trim %>%
+    filter(category == "orifice") %>%
+    ggplot(aes(x = log(area))) +
+    #geom_histogram(bins = 15) + 
+    geom_histogram(bins = 30) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Area~(mu*m^2)))
+
+df.cli.int.trim %>%
+    filter(category == "avicularium") %>%
+    ggplot(aes(x = log(area))) +
+    #geom_histogram(bins = 15) + 
+    geom_histogram(bins = 30) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Area~(mu*m^2)))
+
+df.cli.int.trim %>%
+    filter(category == "ovicell") %>%
+    ggplot(aes(x = log(area))) +
+    #geom_histogram(bins = 15) + 
+    geom_histogram(bins = 30) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Area~(mu*m^2)))
+#ovicell is wild
+
+#because of long left tail, maybe make Tmin stricter
+
+#log transform
+df.cli.int.trim$ln.area <- log(df.cli.int.trim$area)
+df.cli.int.trim$ln.len <- log(df.cli.int.trim$majorAxis)
+df.cli.int.trim$ln.wid <- log(df.cli.int.trim$minorAxis)
+
+## test will be values more than 3 sd away from mean
+# from https://www.reneshbedre.com/blog/find-outliers.html
+# get mean and Standard deviation
+mean.auto.area = mean(df.cli.int.trim$ln.area[df.cli.int.trim$category == "autozooid"])
+std.auto.area = sd(df.cli.int.trim$ln.area[df.cli.int.trim$category == "autozooid"])
+
+mean.avic.area = mean(df.cli.int.trim$ln.area[df.cli.int.trim$category == "avicualrium"])
+std.avic.area = sd(df.cli.int.trim$ln.area[df.cli.int.trim$category == "avicualrium"])
+
+mean.ori.area = mean(df.cli.int.trim$ln.area[df.cli.int.trim$category == "orifice"])
+std.ori.area = sd(df.cli.int.trim$ln.area[df.cli.int.trim$category == "orifice"])
+
+mean.ovi.area = mean(df.cli.int.trim$ln.area[df.cli.int.trim$category == "ovicell"])
+std.ovi.area = sd(df.cli.int.trim$ln.area[df.cli.int.trim$category == "ovicell"])
+
+# get threshold values for outliers
+Tmin.auto.area = mean.auto.area - (2.5*std.auto.area)
+Tmax.auto.area = mean.auto.area + (3*std.auto.area)
+
+Tmin.avic.area = mean.avic.area - (2.5*std.avic.area)
+Tmax.avic.area = mean.avic.area + (3*std.avic.area)
+
+Tmin.ori.area = mean.ori.area - (2.5*std.ori.area)
+Tmax.ori.area = mean.ori.area + (3*std.ori.area)
+
+Tmin.ovi.area = mean.ovi.area - (2.5*std.ovi.area)
+Tmax.ovi.area = mean.ovi.area + (3*std.ovi.area)
+
+# find outliers
+df.cli.int.trim$mean.area <- ""
+df.cli.int.trim$Tmin <- ""
+df.cli.int.trim$Tmax <- ""
+df.cli.int.trim$outlier <- "N"
+
+df.cli.int.trim$mean.area[df.cli.int.trim$category == "autozooid"] <- mean.auto.area
+df.cli.int.trim$mean.area[df.cli.int.trim$category == "avicularium"] <- mean.avic.area
+df.cli.int.trim$mean.area[df.cli.int.trim$category == "orifice"] <- mean.ori.area
+df.cli.int.trim$mean.area[df.cli.int.trim$category == "ovicell"] <- mean.ovi.area
+
+df.cli.int.trim$Tmin[df.cli.int.trim$category == "autozooid"] <- Tmin.auto.area
+df.cli.int.trim$Tmin[df.cli.int.trim$category == "avicularium"] <- Tmin.avic.area
+df.cli.int.trim$Tmin[df.cli.int.trim$category == "orifice"] <- Tmin.ori.area
+df.cli.int.trim$Tmin[df.cli.int.trim$category == "ovicell"] <- Tmin.ovi.area
+
+df.cli.int.trim$Tmax[df.cli.int.trim$category == "autozooid"] <- Tmax.auto.area
+df.cli.int.trim$Tmax[df.cli.int.trim$category == "avicularium"] <- Tmax.avic.area
+df.cli.int.trim$Tmax[df.cli.int.trim$category == "orifice"] <- Tmax.ori.area
+df.cli.int.trim$Tmax[df.cli.int.trim$category == "ovicell"] <- Tmax.ovi.area
+
+df.cli.int.trim$outlier[df.cli.int.trim$ln.area > df.cli.int.trim$Tmax | df.cli.int.trim$ln.area < df.cli.int.trim$Tmin] <- "Y"
+
+df.cli.int.trim$outlier[df.cli.int.trim$category == "ascopore"] <- ""
+
+unique(df.cli.int.trim$image_id[df.cli.int.trim$outlier == "Y"])
+#let's look at some of these
+df.cli.int.trim$V1[df.cli.int.trim$outlier == "Y" & df.cli.int.trim$image_id == "MHR.12566"]
+#look at this in DeepBryo, I expect the following to be removed: 20, 18, 11, 21, 17, 16, 54
+#only overlapping one is 54....
+
+df.cli.int.trim$V1[df.cli.int.trim$outlier == "Y" & df.cli.int.trim$image_id == "MHR.7222"]
+#looking at DeepBryo, I expect the following to be removed: 10, 13, 11, 25, 49, 14
+#only 25 overlaps...
+
+df.cli.int.trim$V1[df.cli.int.trim$outlier == "Y" & df.cli.int.trim$image_id == "MHR.4724"]
+#looking at DeepBryo, I expect the following to be removed: 16, 45, 37
+#two overlaps (45, 37)
+
+##Mahalanobis Outlier test----
+auto.sub <- df.cli.int.trim %>%
+    filter(category == "autozooid") %>%
+    select(ln.area)
+auto.index <- maha(auto.sub, cutoff = 0.9, rnames = FALSE)[[2]] #index of outliers
+
+xx <- auto.sub$ln.area[auto.index]
+
+df.cli.int.trim$outlier.maha <- ""
+df.cli.int.trim$outlier.maha[df.cli.int.trim$ln.area %in% xx 
+                            & df.cli.int.trim$category == "autozooid"] <- "Y"
+
+nrow(df.cli.int.trim[df.cli.int.trim$outlier.maha == "Y",]) #157
+length(xx) #157 same length! 
+
+#let's see which these are!
+unique(df.cli.int.trim$image_id[df.cli.int.trim$outlier.maha == "Y"])
+
+df.cli.int.trim$V1[df.cli.int.trim$outlier.maha == "Y" & df.cli.int.trim$image_id == "MHR.12566"]
+#just 20, that is one which I thought should be...
 
 #### TEST CIRCULARITY ----
 
