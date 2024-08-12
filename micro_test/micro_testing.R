@@ -8,7 +8,7 @@
 # measuarements than running the CLI
 ## this is the comparison of CLI outputs to Lily's manual outputs of M. intermedia
 # 3. test the effect of rotation on estimating zooid categories (NEED TO DO)
-## we use 8679 as an example
+## we use 8679 as an example (M.agonistes)
 # 4. test methods for detecting errors in ML estimations
 # these include testing 
 # a) circularity as a way to find pebbles identified as a zooid
