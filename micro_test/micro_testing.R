@@ -22,6 +22,7 @@ require(ggplot2)
 require(purrr)
 require(data.table)
 require(Hmisc)
+library(scales)
 
 plot.theme <- theme(text = element_text(size = 16),
                     legend.position = "none",
@@ -40,10 +41,13 @@ plot.theme <- theme(text = element_text(size = 16),
 ## FILL = #efdeef
 
 #### DATA ----
+
+##### DISTORTION & TILT ------
 ## these are manually extracted
 df.distort <- read.csv(file = "micro_test/6835_KAH_1_box4_distortion_comparisons.csv",
                        header = TRUE)
 
+##### PICKINESS ------
 ## this is the cli outputs for intermedia
 cli.int.list = list.files(path = "Data/CLI-outputs/M.intermedia/",
                       pattern = "\\.csv$",
@@ -73,6 +77,21 @@ length(unique(df.man.int$image_id)) #25
 ## this is the metadata
 meta.df <- read.csv("Data/Microporella_SEMs_EDM+Mali_05.06.2024.csv",
                     header = TRUE)
+
+##### ROTATION ------
+## this is the rotation data
+df.top <- read.csv("micro_test/MHR.8679_top.csv",
+                   header = TRUE)
+df.right <- read.csv("micro_test/MHR.8679_right.csv",
+                   header = TRUE)
+df.bottom <- read.csv("micro_test/MHR.8679_bottom.csv",
+                   header = TRUE)
+df.left <- read.csv("micro_test/MHR.8679_left.csv",
+                   header = TRUE)
+
+## this is to match boxids
+df.rot.ids <- read.csv("micro_test/rotation.csv",
+                       header = TRUE)
 
 #### DATA MANIPULATION -----
 
@@ -157,6 +176,25 @@ df.man.int.meta <- merge(df.man.int, meta.df.trim,
 df.man.int.all <- rbind(df.man.trim, df.man.int.meta)
 
 setdiff(df.man.int.all$id, df.cli.int.meta$id) #no diffs
+
+##### MERGE AND MATCH ROTATION ------
+## make the rotation df
+df.top$treatment <- "top"
+df.right$treatment <- "right"
+df.bottom$treatment <- "bottom"
+df.left$treatment <- "left"
+
+df.rotation <- rbind(df.top, df.right, df.bottom, df.left)
+
+names(df.rotation)[names(df.rotation) == "X"] <- "box_id"
+
+#add in matching box ids
+df.rotation$id <- paste0(df.rotation$treatment, "_", df.rotation$box_id)
+df.rot.ids$id <- paste0(df.rot.ids$rotation, "_", df.rot.ids$box_id)
+
+df.rot.match <- merge(df.rotation, df.rot.ids,
+                      by = "id", 
+                      all.x = TRUE, all.y = FALSE)
 
 #### TEST DISTORTION & TILT ----
 #going to compare the axes and the area
@@ -763,7 +801,7 @@ p.pick.int.auto.area <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Autozooid~Area~(mu*m^2)),
+    scale_x_continuous(expression(ln~Autozooid~Area~(mu*m^2)),
                        lim = c(10, 13)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -782,7 +820,7 @@ p.pick.int.auto.len <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Autozooid~Length~(mu*m)),
+    scale_x_continuous(expression(ln~Autozooid~Length~(mu*m)),
                        lim = c(5, 7)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -801,7 +839,7 @@ p.pick.int.auto.wid <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Autozooid~Width~(mu*m)),
+    scale_x_continuous(expression(ln~Autozooid~Width~(mu*m)),
                        lim = c(5, 6.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -821,7 +859,7 @@ p.pick.int.ori.area <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Orifice~Area~(mu*m^2)),
+    scale_x_continuous(expression(ln~Orifice~Area~(mu*m^2)),
                        lim = c(7.5, 10.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -840,7 +878,7 @@ p.pick.int.ori.len <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Orifice~Length~(mu*m)),
+    scale_x_continuous(expression(ln~Orifice~Length~(mu*m)),
                        lim = c(4, 5.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -859,7 +897,7 @@ p.pick.int.ori.wid <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Orifice~Width~(mu*m)),
+    scale_x_continuous(expression(ln~Orifice~Width~(mu*m)),
                        lim = c(3.5, 5.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -879,7 +917,7 @@ p.pick.int.avic.area <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Avicularia~Area~(mu*m^2)),
+    scale_x_continuous(expression(ln~Avicularia~Area~(mu*m^2)),
                        lim = c(7, 11)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -898,7 +936,7 @@ p.pick.int.avic.len <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Avicularia~Length~(mu*m)),
+    scale_x_continuous(expression(ln~Avicularia~Length~(mu*m)),
                        lim = c(3.5, 6)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -917,7 +955,7 @@ p.pick.int.avic.wid <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Avicularia~Width~(mu*m)),
+    scale_x_continuous(expression(ln~Avicularia~Width~(mu*m)),
                        lim = c(3, 5.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -937,7 +975,7 @@ p.pick.int.ovi.area <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Ovicell~Area~(mu*m^2)),
+    scale_x_continuous(expression(ln~Ovicell~Area~(mu*m^2)),
                        lim = c(8.5, 12)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -956,7 +994,7 @@ p.pick.int.ovi.len <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Ovicell~Length~(mu*m)),
+    scale_x_continuous(expression(ln~Ovicell~Length~(mu*m)),
                        lim = c(4, 6.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -975,7 +1013,7 @@ p.pick.int.ovi.wid <- df.int.comp %>%
     #geom_histogram(bins = 15) + 
     geom_density(alpha = 0.7) +
     plot.theme +
-    scale_x_continuous(expression(ln~Variance~of~Ovicell~Width~(mu*m)),
+    scale_x_continuous(expression(ln~Ovicell~Width~(mu*m)),
                        lim = c(4, 6.5)) + 
     scale_color_manual(values = stat.col) + 
     scale_fill_manual(values = stat.fill)
@@ -1304,9 +1342,270 @@ ggsave(p.pick.ovi.wid.var,
        width = 14, height = 10, units = "cm")
 
 #### TEST ROTATION ----
+#df.rot.match; .y means the matching file
+df.rot.trim <- df.rot.match[,c(1:4, 7, 12, 13, 28, 30, 31, 32)]
+#trim to only those with the same box ids
+df.rot.trim <- df.rot.trim[!(is.na(df.rot.trim$box_id.y)),]
+
+## which categories are found or not between treatments?
+unique(df.rot.trim$category.y)
+mislabel <- c("ovicell (mislabeled)", "orifice (mislabeled)", "avicularium (mislabeled)")
+nrow(df.rot.trim[df.rot.trim$category.y %in% mislabel,]) #7 
+nrow(df.rot.ids[df.rot.ids$rotation == "top",]) #70 total labels 
+#only 7/70 are mislabeled, or 10%
+#which do not have ids?
+df.rot.ids$cat_id <- paste0(df.rot.ids$category, "_", df.rot.ids$zooid_id)
+table(df.rot.ids$cat_id[is.na(df.rot.ids$box_id)]) #anyone with 4 is always blank
+#this is 2 of them
+length(unique(df.rot.ids$cat_id[is.na(df.rot.ids$box_id)])) #25, but minus 2, so 23 are not always found
+#so 25 out of possible 70 are sometimes not found: 35.7% of the time not found
+
+## what are the differences in size estimations?
+df.rot.trim$treatment <- factor(df.rot.trim$treatment,
+                                levels = c("left", "top",
+                                           "right", "bottom"))
+df.rot.trim <- tidyr::complete(df.rot.trim, treatment, area)
+df.rot.trim <- tidyr::complete(df.rot.trim, treatment, majorAxis)
+df.rot.trim <- tidyr::complete(df.rot.trim, treatment, minorAxis)
+
+###### ROTATION PLOTS ------
+treat.col = c("#F8766D", "#7CAE00",
+              "#00BFC4", "#C77CFF")
+
+#AUTOZOOID
+## AREA
+p.rot.auto.area <- df.rot.trim %>%
+    filter(category.x == "autozooid") %>%
+    ggplot(aes(x = log(area), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Area~(mu*m^2)),
+                       lim = c(9, 12.5)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.auto.area, 
+       file = "./Results/summer_student_project/rot.auto.area.png", 
+       width = 14, height = 10, units = "cm")
+
+## LENGTH
+p.rot.auto.len <- df.rot.trim %>%
+    filter(category.x == "autozooid") %>%
+    ggplot(aes(x = log(majorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Length~(mu*m)),
+                       lim = c(5.5, 6.75)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.auto.len, 
+       file = "./Results/summer_student_project/rot.auto.len.png", 
+       width = 14, height = 10, units = "cm")
+
+## WIDTH
+p.rot.auto.wid <- df.rot.trim %>%
+    filter(category.x == "autozooid") %>%
+    ggplot(aes(x = log(minorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Autozooid~Width~(mu*m)),
+                       lim = c(4.5, 6.5)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.auto.wid, 
+       file = "./Results/summer_student_project/rot.auto.wid.png", 
+       width = 14, height = 10, units = "cm")
+
+##ORIFICE
+## AREA
+p.rot.ori.area <- df.rot.trim %>%
+    filter(category.x == "orifice") %>%
+    ggplot(aes(x = log(area), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Orifice~Area~(mu*m^2)),
+                       lim = c(8, 10)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.ori.area, 
+       file = "./Results/summer_student_project/rot.ori.area.png", 
+       width = 14, height = 10, units = "cm")
+
+## LENGTH
+p.rot.ori.len <- df.rot.trim %>%
+    filter(category.x == "orifice") %>%
+    ggplot(aes(x = log(majorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Orifice~Length~(mu*m)),
+                       lim = c(4.25, 5.25)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.ori.len, 
+       file = "./Results/summer_student_project/rot.ori.len.png", 
+       width = 14, height = 10, units = "cm")
+
+## WIDTH
+p.rot.ori.wid <- df.rot.trim %>%
+    filter(category.x == "orifice") %>%
+    ggplot(aes(x = log(minorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Orifice~Width~(mu*m)),
+                       lim = c(3.5, 5.5)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.ori.wid, 
+       file = "./Results/summer_student_project/rot.ori.wid.png", 
+       width = 14, height = 10, units = "cm")
+
+##AVICULARIA
+## AREA
+p.rot.avic.area <- df.rot.trim %>%
+    filter(category.x == "avicularium") %>%
+    ggplot(aes(x = log(area), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Avicularia~Area~(mu*m^2)),
+                       lim = c(7, 9.75)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.avic.area, 
+       file = "./Results/summer_student_project/rot.avic.area.png", 
+       width = 14, height = 10, units = "cm")
+
+## LENGTH
+p.rot.avic.len <- df.rot.trim %>%
+    filter(category.x == "avicularium") %>%
+    ggplot(aes(x = log(majorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Avicularia~Length~(mu*m)),
+                       lim = c(3.75, 5.5)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.avic.len, 
+       file = "./Results/summer_student_project/rot.avic.len.png", 
+       width = 14, height = 10, units = "cm")
+
+## WIDTH
+p.rot.avic.wid <- df.rot.trim %>%
+    filter(category.x == "avicularium") %>%
+    ggplot(aes(x = log(minorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Avicularia~Width~(mu*m)),
+                       lim = c(3, 5)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.avic.wid, 
+       file = "./Results/summer_student_project/rot.avic.wid.png", 
+       width = 14, height = 10, units = "cm")
+
+##OVICELL
+## AREA
+p.rot.ovi.area <- df.rot.trim %>%
+    filter(category.x == "ovicell") %>%
+    ggplot(aes(x = log(area), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Ovicell~Area~(mu*m^2)),
+                       lim = c(8.5, 12)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.ovi.area, 
+       file = "./Results/summer_student_project/rot.ovi.area.png", 
+       width = 14, height = 10, units = "cm")
+
+## LENGTH
+p.rot.ovi.len <- df.rot.trim %>%
+    filter(category.x == "ovicell") %>%
+    ggplot(aes(x = log(majorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Ovicell~Length~(mu*m)),
+                       lim = c(4.5, 6.5)) +
+    scale_color_manual(values = treat.col) + 
+    scale_fill_manual(values = treat.col)
+
+ggsave(p.rot.ovi.len, 
+       file = "./Results/summer_student_project/rot.ovi.len.png", 
+       width = 14, height = 10, units = "cm")
+
+## WIDTH
+p.rot.ovi.wid <- df.rot.trim %>%
+    filter(category.x == "ovicell") %>%
+    ggplot(aes(x = log(minorAxis), 
+               group = treatment,
+               color = treatment,
+               fill = treatment)) +
+    #geom_histogram(bins = 15) + 
+    geom_density(alpha = 0.5) +
+    plot.theme +
+    scale_x_continuous(expression(ln~Ovicell~Width~(mu*m)),
+                       lim = c(4.5, 6.25))
+
+ggsave(p.rot.ovi.wid, 
+       file = "./Results/summer_student_project/rot.ovi.wid.png", 
+       width = 14, height = 10, units = "cm")
 
 #### TEST OUTLIER DETECTION ----
 ## using intermedia as an example
+
+#see if can use to detect weird things
 
 
 #### TEST CIRCULARITY ----
