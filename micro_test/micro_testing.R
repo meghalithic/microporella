@@ -1768,7 +1768,18 @@ unique(df.cli.int.trim$image_id[df.cli.int.trim$outlier.maha == "Y"])
 df.cli.int.trim$V1[df.cli.int.trim$outlier.maha == "Y" & df.cli.int.trim$image_id == "MHR.12566"]
 #just 20, that is one which I thought should be...
 
+## seems to be a lot of the scale bar left ones...
+
 #### TEST CIRCULARITY ----
+df.cli.int.trim$circularity
+#closer to 1 is more like a circle
+
+df.cli.int.trim$image_id[df.cli.int.trim$circularity > 0.9]
+
+df.cli.int.trim$V1[df.cli.int.trim$circularity > 0.9
+                   & df.cli.int.trim$image_id == "MHR.7995"]
+#58, which is a big hole, but misses 64 and 61
+
 
 #### TEST POLYGON ----
 
