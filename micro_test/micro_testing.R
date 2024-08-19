@@ -1750,13 +1750,13 @@ df.cli.int.trim$V1[df.cli.int.trim$outlier == "Y" & df.cli.int.trim$image_id == 
 ##Mahalanobis Outlier test----
 auto.sub <- df.cli.int.trim %>%
     filter(category == "autozooid") %>%
-    select(ln.area)
-auto.index <- maha(auto.sub, cutoff = 0.9, rnames = FALSE)[[2]] #index of outliers
+    select(area)
+auto.index <- maha(auto.sub, cutoff = 0.8, rnames = FALSE)[[2]] #index of outliers
 
-xx <- auto.sub$ln.area[auto.index]
+xx <- auto.sub$area[auto.index]
 
 df.cli.int.trim$outlier.maha <- ""
-df.cli.int.trim$outlier.maha[df.cli.int.trim$ln.area %in% xx 
+df.cli.int.trim$outlier.maha[df.cli.int.trim$area %in% xx 
                             & df.cli.int.trim$category == "autozooid"] <- "Y"
 
 nrow(df.cli.int.trim[df.cli.int.trim$outlier.maha == "Y",]) #157
