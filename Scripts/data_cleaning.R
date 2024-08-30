@@ -21,6 +21,11 @@ edm.df <- read.csv("Data/Microporella_SELECT_final_datas.csv",
 ##### METADATA ----
 meta.df <- read.csv("Data/Microporella_SEMs_EDM+Mali_05.06.2024.csv",
                     header = TRUE)
+#locality in sample id
+
+#modern localy
+loc.df <- read.csv("Data/SEM_metadta_Microporella_SELECT_final_datasets_26.01.2023.csv",
+                   header = TRUE)
 
 #not using any voucher images
 #vouchers <- read.csv("Data/Vouchers.csv",
@@ -185,6 +190,28 @@ setdiff(int.meta$image_id, edm.df$Image_ID)
 setdiff(spec.meta$image_id, edm.df$Image_ID)
 
 ##### ADD FORMATION INFO -----
+
+###### COMBINE FORMATIONS WITH OVERLAPPING TIMES ------
+#t.range
+#t.mid
+#time.period
+form.df
+
+#including Whanganui Core as modern, because overlaps and includes modern
+form.df$time <- form.df$Formation_name
+form.df$t.mid <- mean(x = c(form.df$Start_age, form.df$End_age))
+form.df$t.range <- form.df$Start_age - form.df$End_age
+
+mod <- c("Northland Cruise", "Cook Strait", "South Taranaki")
+form.df$time[form.df$Formation_name %in% mod] <- "modern"
+form.df$t.mid[form.df$Formation_name %in% mod] <- 0.003
+form.df$t.range[form.df$Formation_name %in% mod] <- 0.006
+
+tewk <- c("Tewkesbury Formation", "Waipuru Shellbed")
+form.df$time[form.df$Formation_name %in% tewk] <- "Tewkesbury Formation"
+form.df$t.mid[form.df$Formation_name %in% mod] <- mean(x = c(1.875, 1.826))
+form.df$t.range[form.df$Formation_name %in% mod] <- 1.875-1.826
+
 colnames(form.df)
 head(form.df$Formation_name)
 ##fix spelling error
@@ -202,6 +229,8 @@ unique(form.df$Formation_name)
 #UCSB = Upper Castlecliff Shellbed
 #off Pipi Rocks?
 
+#and change Waipuru to Tewkesbury
+
 setdiff(agon.meta$Formation, form.df$Formation_name) #missing a lot, maybe spelling?
 #unique(agon.meta$Formation)
 agon.meta$Formation[agon.meta$Formation == "Lower Kai-iwi"] <- "Lower Kai-iwi Shellbed"
@@ -217,9 +246,31 @@ agon.meta$Formation[agon.meta$Formation == "TAINUI SB"] <- "Tainui Shellbed"
 agon.meta$Formation[agon.meta$Formation == "UCSB"] <- "Upper Castlecliff Shellbed"
 setdiff(agon.meta$Formation, form.df$Formation_name) 
 
+disc.meta$Formation[disc.meta$Formation == "Waipuru Shellbed"] <- "Tewkesbury Formation"
+disc.meta$Formation[disc.meta$Formation == "NKBS"] <- "Nukumaru Brown Sand"
+disc.meta$Formation[disc.meta$Formation == "NKLS"] <- "Nukumaru Limestone"
+disc.meta$Formation[disc.meta$Formation == "BUTLERS SC"] <- "Butlers Shell Conglomerate"
+disc.meta$Formation[disc.meta$Formation == "Lower Kai-iwi"] <- "Lower Kai-iwi Shellbed"
+disc.meta$Formation[disc.meta$Formation == "Upper Kai-iwi"] <- "Upper Kai-iwi Shellbed"
 setdiff(disc.df$Formation, form.df$Formation_name)
+
+int.meta$Formation[int.meta$Formation == "Whanganui (core)"] <- "Whanganui Core"
+int.meta$Formation[int.meta$Formation == "LCSB"] <- "Lower Castlecliff Shellbed"
+int.meta$Formation[int.meta$Formation == "SHCS"] <- "Shakespeare Cliff Basal Sand Shellbed"
+int.meta$Formation[int.meta$Formation == "TAINUI SB"] <- "Tainui Shellbed"
 setdiff(int.df$Formation, form.df$Formation_name)
+
+spec.meta$Formation[spec.meta$Formation == "UCSB"] <- "Upper Castlecliff Shellbed"
+spec.meta$Formation[spec.meta$Formation == "LCSB"] <- "Lower Castlecliff Shellbed"
+spec.meta$Formation[spec.meta$Formation == "SHCS"] <- "Shakespeare Cliff Basal Sand Shellbed"
+spec.meta$Formation[spec.meta$Formation == "Upper Kai-iwi"] <- "Upper Kai-iwi Shellbed"
 setdiff(spec.df$Formation, form.df$Formation_name)
+
+#note, ignore off Pipi Rocks
+length(unique(agon.meta$Formation)) #13; really 12
+length(unique(disc.meta$Formation)) #9
+length(unique(int.meta$Formation)) #6
+length(unique(spec.meta$Formation)) #8
 
 agon.meta.form <- merge(agon.meta, form.df,
                         by.x = "Formation", by.y = "Formation_name")
@@ -229,6 +280,43 @@ int.meta.form <- merge(int.meta, form.df,
                        by.x = "Formation", by.y = "Formation_name")
 spec.meta.form <- merge(spec.meta, form.df,
                         by.x = "Formation", by.y = "Formation_name")
+
+length(unique(agon.meta.form$Formation)) #12
+length(unique(disc.meta.form$Formation)) #9
+length(unique(int.meta.form$Formation)) #6
+length(unique(spec.meta.form$Formation)) #8 
+
+#### ADD IN LOCALITY INFO ----
+
+rec.df.meta <- meta.df[meta.df$Age == "Recent",]
+
+rec.df.meta <- loc.df[loc.df$Age == "Recent",]
+
+setdiff(rec.df.meta$Image_ID, rec.df.meta$Image_ID) #no diff
+setdiff(rec.df.meta$Image_ID, rec.df.meta$Image_ID) #no diff
+
+#use Sample_ID
+
+#### MAKE SURE EACH COLONY HAS AT LEAST 3 OF EVERY CATEGORY ----
+#remove opesia, spiramen
+rm.category <- c("opesia", "spiramen")
+agon.meta.form <- agon.meta.form[!(agon.meta.form$category %in% rm.category),]
+disc.meta.form <- disc.meta.form[!(disc.meta.form$category %in% rm.category),]
+int.meta.form <- int.meta.form[!(int.meta.form$category %in% rm.category),]
+spec.meta.form <- spec.meta.form[!(spec.meta.form$category %in% rm.category),]
+
+table(agon.meta.form$time, agon.meta.form$category) #Upper Castlecliff Shellbed has no ovicells...
+table(disc.meta.form$time, disc.meta.form$category) #Butlers Shell Conglomerate and Tewkesbury Formation have no ovicells...
+table(int.meta.form$time, int.meta.form$category) #Shakespeare Cliff Basal Sand Shellbed  has only 2 ovicells
+table(spec.meta.form$time, spec.meta.form$category) #Upper Castlecliff Shellbed has only 1 ovicell
+
+#### SAVE DATA ----
+cli.meta.form.list = list(agon.meta.form,
+                          disc.meta.form,
+                          int.meta.form,
+                          spec.meta.form)
+save(cli.meta.form.list,
+     file = "Data/cli.meta.form.list.RData")
 
 #### MATCH ZOOIDS ----
 #use polygons to match ascopore, avicularia, and orifice to autozooid
@@ -586,12 +674,3 @@ sf_object <- geojson_sf(geojson_string[1])
 
 st_intersects(sf_object)
 
-#### MAKE SURE EACH COLONY HAS AT LEAST 3 OF EVERY CATEGORY ----
-
-#### SAVE DATA ----
-cli.meta.form.list = list(agon.meta.form,
-                          disc.meta.form,
-                          int.meta.form,
-                          spec.meta.form)
-save(cli.meta.form.list,
-     file = "Data/cli.meta.form.list.RData")
