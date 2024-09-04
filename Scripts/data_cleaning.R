@@ -190,27 +190,7 @@ setdiff(int.meta$image_id, edm.df$Image_ID)
 setdiff(spec.meta$image_id, edm.df$Image_ID)
 
 ##### ADD FORMATION INFO -----
-
-###### COMBINE FORMATIONS WITH OVERLAPPING TIMES ------
-#t.range
-#t.mid
-#time.period
 form.df
-
-#including Whanganui Core as modern, because overlaps and includes modern
-form.df$time <- form.df$Formation_name
-form.df$t.mid <- mean(x = c(form.df$Start_age, form.df$End_age))
-form.df$t.range <- form.df$Start_age - form.df$End_age
-
-mod <- c("Northland Cruise", "Cook Strait", "South Taranaki")
-form.df$time[form.df$Formation_name %in% mod] <- "modern"
-form.df$t.mid[form.df$Formation_name %in% mod] <- 0.003
-form.df$t.range[form.df$Formation_name %in% mod] <- 0.006
-
-tewk <- c("Tewkesbury Formation", "Waipuru Shellbed")
-form.df$time[form.df$Formation_name %in% tewk] <- "Tewkesbury Formation"
-form.df$t.mid[form.df$Formation_name %in% mod] <- mean(x = c(1.875, 1.826))
-form.df$t.range[form.df$Formation_name %in% mod] <- 1.875-1.826
 
 colnames(form.df)
 head(form.df$Formation_name)
@@ -229,10 +209,33 @@ unique(form.df$Formation_name)
 #UCSB = Upper Castlecliff Shellbed
 #off Pipi Rocks?
 
+###### COMBINE FORMATIONS WITH OVERLAPPING TIMES ------
+
+#t.range
+#t.mid
+#time.period
+
+form.df$time <- form.df$Formation_name
+form.df$t.mid <- mean(x = c(form.df$Start_age, form.df$End_age))
+form.df$t.range <- form.df$Start_age - form.df$End_age
+
+mod <- c("Northland Cruise", "Cook Strait", "South Taranaki")
+form.df$time[form.df$Formation_name %in% mod] <- "modern"
+form.df$t.mid[form.df$Formation_name %in% mod] <- 0
+form.df$t.range[form.df$Formation_name %in% mod] <- 0
+
+tewk <- c("Tewkesbury Formation", "Waipuru Shellbed")
+form.df$time[form.df$Formation_name %in% tewk] <- "Tewkesbury Formation"
+form.df$t.mid[form.df$Formation_name %in% mod] <- mean(x = c(1.875, 1.826))
+form.df$t.range[form.df$Formation_name %in% mod] <- 1.875-1.826
+
+
+###### MERGE ------
+
 #and change Waipuru to Tewkesbury
 
 setdiff(agon.meta$Formation, form.df$Formation_name) #missing a lot, maybe spelling?
-#unique(agon.meta$Formation)
+unique(agon.meta$Formation)
 agon.meta$Formation[agon.meta$Formation == "Lower Kai-iwi"] <- "Lower Kai-iwi Shellbed"
 agon.meta$Formation[agon.meta$Formation == "TEWKESBURY"] <- "Tewkesbury Formation"
 agon.meta$Formation[agon.meta$Formation == "Tewkesbury"] <- "Tewkesbury Formation"
@@ -246,25 +249,28 @@ agon.meta$Formation[agon.meta$Formation == "TAINUI SB"] <- "Tainui Shellbed"
 agon.meta$Formation[agon.meta$Formation == "UCSB"] <- "Upper Castlecliff Shellbed"
 setdiff(agon.meta$Formation, form.df$Formation_name) 
 
+unique(disc.meta$Formation)
 disc.meta$Formation[disc.meta$Formation == "Waipuru Shellbed"] <- "Tewkesbury Formation"
 disc.meta$Formation[disc.meta$Formation == "NKBS"] <- "Nukumaru Brown Sand"
 disc.meta$Formation[disc.meta$Formation == "NKLS"] <- "Nukumaru Limestone"
 disc.meta$Formation[disc.meta$Formation == "BUTLERS SC"] <- "Butlers Shell Conglomerate"
 disc.meta$Formation[disc.meta$Formation == "Lower Kai-iwi"] <- "Lower Kai-iwi Shellbed"
 disc.meta$Formation[disc.meta$Formation == "Upper Kai-iwi"] <- "Upper Kai-iwi Shellbed"
-setdiff(disc.df$Formation, form.df$Formation_name)
+setdiff(disc.meta$Formation, form.df$Formation_name)
 
+unique(int.meta$Formation)
 int.meta$Formation[int.meta$Formation == "Whanganui (core)"] <- "Whanganui Core"
 int.meta$Formation[int.meta$Formation == "LCSB"] <- "Lower Castlecliff Shellbed"
 int.meta$Formation[int.meta$Formation == "SHCS"] <- "Shakespeare Cliff Basal Sand Shellbed"
 int.meta$Formation[int.meta$Formation == "TAINUI SB"] <- "Tainui Shellbed"
-setdiff(int.df$Formation, form.df$Formation_name)
+setdiff(int.meta$Formation, form.df$Formation_name)
 
+unique(spec.meta$Formation)
 spec.meta$Formation[spec.meta$Formation == "UCSB"] <- "Upper Castlecliff Shellbed"
 spec.meta$Formation[spec.meta$Formation == "LCSB"] <- "Lower Castlecliff Shellbed"
 spec.meta$Formation[spec.meta$Formation == "SHCS"] <- "Shakespeare Cliff Basal Sand Shellbed"
 spec.meta$Formation[spec.meta$Formation == "Upper Kai-iwi"] <- "Upper Kai-iwi Shellbed"
-setdiff(spec.df$Formation, form.df$Formation_name)
+setdiff(spec.meta$Formation, form.df$Formation_name)
 
 #note, ignore off Pipi Rocks
 length(unique(agon.meta$Formation)) #13; really 12
@@ -310,13 +316,519 @@ table(disc.meta.form$time, disc.meta.form$category) #Butlers Shell Conglomerate 
 table(int.meta.form$time, int.meta.form$category) #Shakespeare Cliff Basal Sand Shellbed  has only 2 ovicells
 table(spec.meta.form$time, spec.meta.form$category) #Upper Castlecliff Shellbed has only 1 ovicell
 
+#### MEANS ----
+cat.keep <- c("autozooid", "avicularium", "ovicell")
+
+##### AGONISTES -----
+## use means to figure out which formations have too few colonies
+## use n.zooids to figure out which colonies have too few zooid types
+
+###### by formation & colony ------
+agon_mean_by_formation_colony = agon.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(agon_mean_by_formation_colony$n.zooid) #15
+
+agon_mean_by_formation_colony %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+
+#Tewkesbury and Upper Castle cliff do not have enough colonies per formation
+rm.agon.form <- c("Tewkesbury Formation", "Upper Castlecliff Shellbed")
+agon.meta.form.trim <- agon.meta.form[!(agon.meta.form$time %in% rm.agon.form),]
+
+agon_mean_by_formation_colony <- agon_mean_by_formation_colony[!(agon_mean_by_formation_colony$time %in% rm.agon.form),]
+
+###### by formation, colony, & category ------
+agon_mean_by_formation_colony_cat = agon.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id, category) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+table(agon_mean_by_formation_colony_cat[agon_mean_by_formation_colony_cat$n.zooid < 3,
+                                        c(1, 3)])
+#mostly ovicell and 1 avicularium
+#for the by type, let's remove these ones
+rm.agon <- agon_mean_by_formation_colony_cat$col.id[agon_mean_by_formation_colony_cat$n.zooid < 3]
+agon.meta.form.cat <- agon.meta.form[!(agon.meta.form$col.id %in% rm.agon),]
+agon.meta.form.cat %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+#remove the ones with too few n.zoo
+#Tewkesbury Formation, Upper Castlecliff Shellbed for ovicell; Lower Kai-iwi Shellbed for avicularium
+unique(agon_mean_by_formation_colony_cat$category[agon_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+
+## TO DO: WHAT AND HOW TO REMOVE ----
+
+rm.form.agon.cat <- c("Tewkesbury Formation", "Upper Castlecliff Shellbed", "Lower Kai-iwi Shellbed")
+agon.meta.form.cat.trim <- agon.meta.form.cat[!(agon.meta.form.cat$time %in% rm.form.agon.cat),]
+unique(agon.meta.form.cat.trim$time)
+
+agon_mean_by_formation_colony_cat <- agon_mean_by_formation_colony_cat[!(agon_mean_by_formation_colony_cat$time %in% rm.form.agon.cat),]
+
+###### just auto ------
+agon_mean_by_formation_colony_auto = agon.meta.form %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(agon_mean_by_formation_colony_auto$n.zooid) #11
+
+agon_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame()
+#remove only those formations from above with too few colonies
+
+agon.meta.form.auto <- agon.meta.form[agon.meta.form$category == "autozooid"
+                                      & !(agon.meta.form$time %in% rm.agon.form),]
+
+agon_mean_by_formation_colony_auto <- agon_mean_by_formation_colony_auto[!(agon_mean_by_formation_colony_auto$time %in% rm.agon.form),]
+
+agon_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame() 
+#all at least have three
+
+###### by formation, matching formations in auto ------
+agon_mean_by_formation = agon.meta.form %>%
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(num.col = length(unique(col.id)),
+                     num.zooid = length(unique(id)),
+                     avg.zooid = ceiling(num.zooid/num.col), #round up to nearest integer
+                     
+                     min.len = min(ln.len, na.rm = T),
+                     max.len = max(ln.len, na.rm = T),
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     var.len = var(ln.len, na.rm = T),
+                     
+                     min.wid = min(ln.wid, na.rm = T),
+                     max.wid = max(ln.wid, na.rm = T),
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T),
+                     var.wid = var(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+agon_mean_by_formation <- agon_mean_by_formation[!(agon_mean_by_formation$time %in% rm.agon.form),]
+
+write.csv(agon_mean_by_formation,
+          "Results/agon.mean.per.formation.csv",
+          row.names = FALSE)
+
+
+##### DISCORS -----
+###### by formation & colony ------
+disc_mean_by_formation_colony = disc.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(disc_mean_by_formation_colony$n.zooid) #14
+
+disc_mean_by_formation_colony %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+
+#Butlers Shell Conglomerate and Tewkesbury Formation do not have enough colonies per formation
+rm.disc.form <- c("Tewkesbury Formation", "Butlers Shell Conglomerate")
+disc.meta.form.trim <- disc.meta.form[!(disc.meta.form$time %in% rm.disc.form),]
+
+disc_mean_by_formation_colony <- disc_mean_by_formation_colony[!(disc_mean_by_formation_colony$time %in% rm.disc.form),]
+
+###### by formation, colony, & category ------
+disc_mean_by_formation_colony_cat = disc.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id, category) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+table(disc_mean_by_formation_colony_cat[disc_mean_by_formation_colony_cat$n.zooid < 3,
+                                        c(1, 3)])
+#only ovicell
+#for the by type, let's remove these ones
+rm.disc <- disc_mean_by_formation_colony_cat$col.id[disc_mean_by_formation_colony_cat$n.zooid < 3]
+disc.meta.form.cat <- disc.meta.form[!(disc.meta.form$col.id %in% rm.disc),]
+disc.meta.form.cat %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+#remove the ones with too few n.zoo
+#Tewkesbury Formation, Butlers Shell Conglomerate, Nukumaru Limestone
+unique(disc_mean_by_formation_colony_cat$category[disc_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+
+## TO DO: WHAT AND HOW TO REMOVE ----
+
+rm.form.disc.cat <- c("Tewkesbury Formation", "Butlers Shell Conglomerate", "Nukumaru Limestone")
+disc.meta.form.cat.trim <- disc.meta.form.cat[!(disc.meta.form.cat$time %in% rm.form.disc.cat),]
+unique(disc.meta.form.cat$time)
+
+disc_mean_by_formation_colony_cat <- disc_mean_by_formation_colony_cat[!(disc_mean_by_formation_colony_cat$time %in% rm.form.disc.cat),]
+
+###### just auto ------
+disc_mean_by_formation_colony_auto = disc.meta.form %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(disc_mean_by_formation_colony_auto$n.zooid) #9
+
+disc_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame()
+unique(disc_mean_by_formation_colony_cat$category[disc_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+#no auto has too few colonies
+#remove only those formations from above with too few colonies
+
+disc.meta.form.auto <- disc.meta.form[disc.meta.form$category == "autozooid"
+                                      & !(disc.meta.form$time %in% rm.disc.form),]
+
+disc_mean_by_formation_colony_auto <- disc_mean_by_formation_colony_auto[!(disc_mean_by_formation_colony_auto$time %in% rm.disc.form),]
+
+disc_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame() #all have at least 3
+
+###### by formation, matching formations in auto ------
+disc_mean_by_formation = disc.meta.form %>%
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(num.col = length(unique(col.id)),
+                     num.zooid = length(unique(id)),
+                     avg.zooid = ceiling(num.zooid/num.col), #round up to nearest integer
+                     
+                     min.len = min(ln.len, na.rm = T),
+                     max.len = max(ln.len, na.rm = T),
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     var.len = var(ln.len, na.rm = T),
+                     
+                     min.wid = min(ln.wid, na.rm = T),
+                     max.wid = max(ln.wid, na.rm = T),
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T),
+                     var.wid = var(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+disc_mean_by_formation <- disc_mean_by_formation[!(disc_mean_by_formation$time %in% rm.disc.form),]
+
+write.csv(disc_mean_by_formation,
+          "Results/disc.mean.per.formation.csv",
+          row.names = FALSE)
+
+##### INTERMEDIA -----
+###### by formation & colony ------
+int_mean_by_formation_colony = int.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(int_mean_by_formation_colony$n.zooid) #23
+
+int_mean_by_formation_colony %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+
+#Shakespeare Cliff Basal Sand Shellbed and Tainui Shellbed do not have enough colonies per formation
+rm.int.form <- c("Shakespeare Cliff Basal Sand Shellbed", "Tainui Shellbed")
+int.meta.form.trim <- int.meta.form[!(int.meta.form$time %in% rm.int.form),]
+
+int_mean_by_formation_colony <- int_mean_by_formation_colony[!(int_mean_by_formation_colony$time %in% rm.int.form),]
+
+###### by formation, colony, & category ------
+int_mean_by_formation_colony_cat = int.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id, category) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+table(int_mean_by_formation_colony_cat[int_mean_by_formation_colony_cat$n.zooid < 3,
+                                       c(1, 3)])
+#only ovicell
+#for the by type, let's remove these ones #only modern has any!
+rm.int <- int_mean_by_formation_colony_cat$col.id[int_mean_by_formation_colony_cat$n.zooid < 3]
+int.meta.form.cat <- int.meta.form[!(int.meta.form$col.id %in% rm.int),]
+int.meta.form.cat %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+#remove the ones with too few n.zoo
+#Tainui Shellbed, Lower Castlecliff Shellbed
+#NOTE: two formations
+unique(int_mean_by_formation_colony_cat$category[int_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+
+## TO DO: WHAT AND HOW TO REMOVE ----
+
+rm.form.int.cat <- c("Tainui Shellbed", "Lower Castlecliff Shellbed")
+int.meta.form.cat.trim <- int.meta.form.cat[!(int.meta.form.cat$time %in% rm.form.int.cat),]
+unique(int.meta.form.cat.trim$time)
+
+int_mean_by_formation_colony_cat <- int_mean_by_formation_colony_cat[!(int_mean_by_formation_colony_cat$time %in% rm.form.int.cat),]
+
+###### just auto ------
+int_mean_by_formation_colony_auto = int.meta.form %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(int_mean_by_formation_colony_auto$n.zooid) #13
+
+int_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame()
+unique(int_mean_by_formation_colony_cat$category[int_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+#no auto has too few colonies
+#remove only those formations from above with too few colonies
+
+int.meta.form.auto <- int.meta.form[int.meta.form$category == "autozooid"
+                                    & !(int.meta.form$time %in% rm.int.form),]
+
+int_mean_by_formation_colony_auto <- int_mean_by_formation_colony_auto[!(int_mean_by_formation_colony_auto$time %in% rm.int.form),]
+int_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame()
+
+###### by formation, matching formations in auto ------
+int_mean_by_formation = int.meta.form %>%
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(num.col = length(unique(col.id)),
+                     num.zooid = length(unique(id)),
+                     avg.zooid = ceiling(num.zooid/num.col), #round up to nearest integer
+                     
+                     min.len = min(ln.len, na.rm = T),
+                     max.len = max(ln.len, na.rm = T),
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     var.len = var(ln.len, na.rm = T),
+                     
+                     min.wid = min(ln.wid, na.rm = T),
+                     max.wid = max(ln.wid, na.rm = T),
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T),
+                     var.wid = var(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+int_mean_by_formation <- int_mean_by_formation[!(int_mean_by_formation$time %in% rm.int.form),]
+
+write.csv(int_mean_by_formation,
+          "Results/int.mean.per.formation.csv",
+          row.names = FALSE)
+
+##### SPECULUM -----
+###### by formation & colony ------
+spec_mean_by_formation_colony = spec.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(spec_mean_by_formation_colony$n.zooid) #12
+
+spec_mean_by_formation_colony %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+#Upper Castlecliff Shellbed and Upper Westmere Shellbed do not have enough colonies per formation
+rm.spec.form <- c("Upper Castlecliff Shellbed", "Upper Westmere Shellbed")
+spec.meta.form.trim <- spec.meta.form[!(spec.meta.form$time %in% rm.spec.form),]
+
+spec_mean_by_formation_colony <- spec_mean_by_formation_colony[!(spec_mean_by_formation_colony$time %in% rm.spec.form),]
+
+###### by formation, colony, & category ------
+spec_mean_by_formation_colony_cat = spec.meta.form %>% #use this going forward
+    filter(category %in% cat.keep) %>%
+    dplyr::group_by(time, col.id, category) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+table(spec_mean_by_formation_colony_cat[spec_mean_by_formation_colony_cat$n.zooid < 3,
+                                        c(1, 3)])
+#only ovicell
+#for the by type, let's remove these ones
+rm.spec <- spec_mean_by_formation_colony_cat$col.id[spec_mean_by_formation_colony_cat$n.zooid < 3]
+spec.meta.form.cat <- spec.meta.form[!(spec.meta.form$col.id %in% rm.spec),]
+spec.meta.form.cat %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.col = length(unique(col.id)))
+#remove the ones with too few n.zoo
+#Upper Castlecliff Shellbed, Upper Westmere Shellbed
+unique(spec_mean_by_formation_colony_cat$category[spec_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+
+## TO DO: WHAT AND HOW TO REMOVE ----
+
+rm.form.spec.cat <- c("Upper Castlecliff Shellbed", "Upper Westmere Shellbed")
+spec.meta.form.cat.trim <- spec.meta.form.cat[!(spec.meta.form.cat$time %in% rm.form.spec.cat),]
+unique(spec.meta.form.cat.trim$time)
+
+spec_mean_by_formation_colony_cat <- spec_mean_by_formation_colony_cat[!(spec_mean_by_formation_colony_cat$time %in% rm.form.spec.cat),]
+
+###### just auto ------
+spec_mean_by_formation_colony_auto = spec.meta.form %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time, col.id) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+min(spec_mean_by_formation_colony_auto$n.zooid) #5
+
+spec_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame()
+unique(spec_mean_by_formation_colony_cat$category[spec_mean_by_formation_colony_cat$n.zooid < 3]) #none are autozooids
+#no auto has too few colonies
+#remove only those formations from above with too few colonies
+
+spec.meta.form.auto <- spec.meta.form[spec.meta.form$category == "autozooid"
+                                      & !(spec.meta.form$time %in% rm.spec.form),]
+
+spec_mean_by_formation_colony_auto <- spec_mean_by_formation_colony_auto[!(spec_mean_by_formation_colony_auto$time %in% rm.spec.form),]
+
+spec_mean_by_formation_colony_auto %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarise(n.auto.col = length(unique(col.id))) %>%
+    as.data.frame() #all have at least 3
+
+###### by formation, matching formations in auto ------
+spec_mean_by_formation = spec.meta.form %>%
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(num.col = length(unique(col.id)),
+                     num.zooid = length(unique(id)),
+                     avg.zooid = ceiling(num.zooid/num.col), #round up to nearest integer
+                     
+                     min.len = min(ln.len, na.rm = T),
+                     max.len = max(ln.len, na.rm = T),
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     var.len = var(ln.len, na.rm = T),
+                     
+                     min.wid = min(ln.wid, na.rm = T),
+                     max.wid = max(ln.wid, na.rm = T),
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T),
+                     var.wid = var(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+spec_mean_by_formation <- spec_mean_by_formation[!(spec_mean_by_formation$time %in% rm.spec.form),]
+
+write.csv(spec_mean_by_formation,
+          "Results/spec.mean.per.formation.csv",
+          row.names = FALSE)
+
 #### SAVE DATA ----
-cli.meta.form.list = list(agon.meta.form,
-                          disc.meta.form,
-                          int.meta.form,
-                          spec.meta.form)
+mean.list = list(agon_mean_by_formation_colony,
+                 disc_mean_by_formation_colony,
+                 int_mean_by_formation_colony,
+                 spec_mean_by_formation_colony,
+                 agon_mean_by_formation_colony_cat,
+                 disc_mean_by_formation_colony_cat,
+                 int_mean_by_formation_colony_cat,
+                 spec_mean_by_formation_colony_cat,
+                 agon_mean_by_formation_colony_auto,
+                 disc_mean_by_formation_colony_auto,
+                 int_mean_by_formation_colony_auto,
+                 spec_mean_by_formation_colony_auto,
+                 agon_mean_by_formation,
+                 disc_mean_by_formation,
+                 int_mean_by_formation,
+                 spec_mean_by_formation)
+save(mean.list,
+     file = "Data/mean.list.RData")
+
+cli.meta.form.list = list(agon.meta.form.trim,
+                          disc.meta.form.trim,
+                          int.meta.form.trim,
+                          spec.meta.form.trim)
 save(cli.meta.form.list,
      file = "Data/cli.meta.form.list.RData")
+
+cli.meta.form.cat.list = list(agon.meta.form.cat.trim,
+                              disc.meta.form.cat.trim,
+                              int.meta.form.cat.trim,
+                              spec.meta.form.cat.trim)
+save(cli.meta.form.cat.list,
+     file = "Data/cli.meta.form.cat.list.RData")
+
+cli.meta.form.auto.list = list(agon.meta.form.auto,
+                               disc.meta.form.auto,
+                               int.meta.form.auto,
+                               spec.meta.form.auto)
+save(cli.meta.form.auto.list,
+     file = "Data/cli.meta.form.auto.list.RData")
 
 #### MATCH ZOOIDS ----
 #use polygons to match ascopore, avicularia, and orifice to autozooid
