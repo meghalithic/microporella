@@ -2337,7 +2337,7 @@ p.evol.spec <- ggplot(spec_sum.trim, aes(x = form.trans)) +
     scale_x_discrete(name = "Formation",
                      guide = guide_axis(angle = 45)) +
     scale_y_continuous(name = "Evolvability") +
-    ggtitle(expression(paste(italic("M. intermedia")))) +
+    ggtitle(expression(paste(italic("M. speculum")))) +
     plot.theme
 #negative evolvability?
 
