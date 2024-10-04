@@ -830,6 +830,107 @@ cli.meta.form.auto.list = list(agon.meta.form.auto,
 save(cli.meta.form.auto.list,
      file = "Data/cli.meta.form.auto.list.RData")
 
+#### PLOT TRAITS AND OVERLAP ----
+#colors:
+##CB4125
+##997652
+##8CB1A8
+##48A0B2
+##EFCC64
+
+##### autozooid ----
+ggplot() +
+    geom_density(data = agon.meta.form[agon.meta.form$category == "autozooid" & agon.meta.form$time %in% unique(agon_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#EFCC64") +
+    geom_density(data = disc.meta.form[disc.meta.form$category == "autozooid" & disc.meta.form$time %in% unique(disc_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#48A0B2") +
+    geom_density(data = int.meta.form[int.meta.form$category == "autozooid" & int.meta.form$time %in% unique(int_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#997652") +
+    geom_density(data = spec.meta.form[spec.meta.form$category == "autozooid" & spec.meta.form$time %in% unique(spec_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#CB4125") +
+    plot.theme
+
+ggplot() +
+    geom_density(data = agon.meta.form[agon.meta.form$category == "autozooid" & agon.meta.form$time %in% unique(agon_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#EFCC64") +
+    geom_density(data = disc.meta.form[disc.meta.form$category == "autozooid" & disc.meta.form$time %in% unique(disc_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#48A0B2") +
+    geom_density(data = int.meta.form[int.meta.form$category == "autozooid" & int.meta.form$time %in% unique(int_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#997652") +
+    geom_density(data = spec.meta.form[spec.meta.form$category == "autozooid" & spec.meta.form$time %in% unique(spec_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#CB4125") +
+    plot.theme
+
+##### avicularia ----
+ggplot() +
+    geom_density(data = agon.meta.form[agon.meta.form$category == "avicularium" & agon.meta.form$time %in% unique(agon_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#EFCC64") +
+    geom_density(data = disc.meta.form[disc.meta.form$category == "avicularium" & disc.meta.form$time %in% unique(disc_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#48A0B2") +
+    geom_density(data = int.meta.form[int.meta.form$category == "avicularium" & int.meta.form$time %in% unique(int_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#997652") +
+    geom_density(data = spec.meta.form[spec.meta.form$category == "avicularium" & spec.meta.form$time %in% unique(spec_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#CB4125") +
+    plot.theme
+
+ggplot() +
+    geom_density(data = agon.meta.form[agon.meta.form$category == "avicularium" & agon.meta.form$time %in% unique(agon_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#EFCC64") +
+    geom_density(data = disc.meta.form[disc.meta.form$category == "avicularium" & disc.meta.form$time %in% unique(disc_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#48A0B2") +
+    geom_density(data = int.meta.form[int.meta.form$category == "avicularium" & int.meta.form$time %in% unique(int_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#997652") +
+    geom_density(data = spec.meta.form[spec.meta.form$category == "avicularium" & spec.meta.form$time %in% unique(spec_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#CB4125") +
+    plot.theme
+
+##### ovicell ----
+ggplot() +
+    geom_density(data = agon.meta.form[agon.meta.form$category == "ovicell" & agon.meta.form$time %in% unique(agon_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#EFCC64") +
+    geom_density(data = disc.meta.form[disc.meta.form$category == "ovicell" & disc.meta.form$time %in% unique(disc_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#48A0B2") +
+    geom_density(data = int.meta.form[int.meta.form$category == "ovicell" & int.meta.form$time %in% unique(int_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#997652") +
+    geom_density(data = spec.meta.form[spec.meta.form$category == "ovicell" & spec.meta.form$time %in% unique(spec_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.len),
+                 col = "#CB4125") +
+    plot.theme
+
+ggplot() +
+    geom_density(data = agon.meta.form[agon.meta.form$category == "ovicell" & agon.meta.form$time %in% unique(agon_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#EFCC64") +
+    geom_density(data = disc.meta.form[disc.meta.form$category == "ovicell" & disc.meta.form$time %in% unique(disc_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#48A0B2") +
+    geom_density(data = int.meta.form[int.meta.form$category == "ovicell" & int.meta.form$time %in% unique(int_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#997652") +
+    geom_density(data = spec.meta.form[spec.meta.form$category == "ovicell" & spec.meta.form$time %in% unique(spec_mean_by_formation_colony_cat$time)],
+                 aes(x = ln.wid),
+                 col = "#CB4125") +
+    plot.theme
+
 #### MATCH ZOOIDS ----
 #use polygons to match ascopore, avicularia, and orifice to autozooid
 

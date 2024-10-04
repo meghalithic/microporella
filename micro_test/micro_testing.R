@@ -74,7 +74,7 @@ manual.list <- manual.list[30:46] #[5:29]
 
 df.man.int <- do.call(rbind, lapply(manual.list, function(x) fread(x, stringsAsFactors = FALSE)))
 nrow(df.man.int)
-length(unique(df.man.int$image_id)) #25
+length(unique(df.man.int$image_id)) #17
 
 ## this is the metadata
 meta.df <- read.csv("Data/Microporella_SEMs_EDM+Mali_05.06.2024.csv",

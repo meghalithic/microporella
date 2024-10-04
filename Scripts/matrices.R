@@ -29,10 +29,10 @@ spec.meta.form.cat <- cli.meta.form.cat.list[[4]]
 #this includes just autozooids with minimum 3 zooids per colony, and minimum 3 colonies per formation
 load(file = "Data/cli.meta.form.auto.list.RData") #load the g matrices calculated above 
 
-agon.meta.form.auto <- cli.meta.form.list.auto[[1]]
-disc.meta.form.auto <- cli.meta.form.list.auto[[2]]
-int.meta.form.auto <- cli.meta.form.list.auto[[3]]
-spec.meta.form.auto <- cli.meta.form.list.auto[[4]]
+agon.meta.form.auto <- cli.meta.form.auto.list[[1]]
+disc.meta.form.auto <- cli.meta.form.auto.list[[2]]
+int.meta.form.auto <- cli.meta.form.auto.list[[3]]
+spec.meta.form.auto <- cli.meta.form.auto.list[[4]]
 
 ##means
 load(file = "Data/mean.list.RData") 
@@ -42,7 +42,7 @@ disc_mean_by_formation_colony <- mean.list[[2]]
 int_mean_by_formation_colony <- mean.list[[3]]
 spec_mean_by_formation_colony <- mean.list[[4]]
 agon_mean_by_formation_colony_cat <- mean.list[[5]]
-dic_mean_by_formation_colony_cat <- mean.list[[6]]
+disc_mean_by_formation_colony_cat <- mean.list[[6]]
 int_mean_by_formation_colony_cat <- mean.list[[7]]
 spec_mean_by_formation_colony_cat <- mean.list[[8]]
 
@@ -233,6 +233,29 @@ p.agon.auto.wid = ggplot(data = agon.mat[agon.mat$category == "autozooid",]) +
     scale_x_continuous(name = traits[2]) +
     scale_color_manual(values = agon.col.form)
 
+agon_mean_by_formation = agon.mat %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+p.agon.auto.len.wid = ggplot(data = agon_mean_by_formation) + 
+    geom_point(aes(x = avg.len,
+                   y = avg.wid, 
+                     group = time,
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. agonistes")," autozooid"))) + 
+    scale_x_continuous(name = traits[1]) +
+    scale_y_continuous(name = traits[2]) +
+    scale_color_manual(values = agon.col.form)
+
 # p.agon.avic.len = ggplot(agon.mat[agon.mat$category == "avicularium",]) + 
 #     geom_density(aes(x = agon.mat[agon.mat$category == "avicularium", traits[1]], 
 #                      group = time,
@@ -282,6 +305,28 @@ p.agon.auto.wid = ggplot(data = agon.mat[agon.mat$category == "autozooid",]) +
 #       file = "./Results/agon.trait.distribution.png", 
 #       width = 14, height = 20, units = "cm")
 
+ggplot(agon.mat[agon.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = agon.mat[agon.mat$category == "autozooid", traits[1]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. agonistes")," autozooid"))) + 
+    scale_y_continuous(name = traits[1]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = agon.col.form)
+
+ggplot(agon.mat[agon.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = agon.mat[agon.mat$category == "autozooid", traits[2]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. agonistes")," autozooid"))) + 
+    scale_y_continuous(name = traits[2]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = agon.col.form)
+
 ##### discors ----
 p.disc.auto.len = ggplot(disc.mat[disc.mat$category == "autozooid",]) + 
     geom_density(aes(x = disc.mat[disc.mat$category == "autozooid", traits[1]], 
@@ -299,6 +344,29 @@ p.disc.auto.wid = ggplot(data = disc.mat[disc.mat$category == "autozooid",]) +
     plot.theme +
     ggtitle(expression(paste(italic("M. discors")," autozooid"))) + 
     scale_x_continuous(name = traits[2]) +
+    scale_color_manual(values = disc.col.form)
+
+disc_mean_by_formation = disc.mat %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+p.disc.auto.len.wid = ggplot(data = disc_mean_by_formation) + 
+    geom_point(aes(x = avg.len,
+                   y = avg.wid, 
+                   group = time,
+                   col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. discors")," autozooid"))) + 
+    scale_x_continuous(name = traits[1]) +
+    scale_y_continuous(name = traits[2]) +
     scale_color_manual(values = disc.col.form)
 
 # p.disc.avic.len = ggplot(disc.mat[disc.mat$category == "avicularium",]) + 
@@ -350,6 +418,28 @@ p.disc.auto.wid = ggplot(data = disc.mat[disc.mat$category == "autozooid",]) +
 #        file = "./Results/disc.trait.distribution.png", 
 #        width = 14, height = 20, units = "cm")
 
+ggplot(disc.mat[disc.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = disc.mat[disc.mat$category == "autozooid", traits[1]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. discors")," autozooid"))) + 
+    scale_y_continuous(name = traits[1]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = disc.col.form)
+
+ggplot(disc.mat[disc.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = disc.mat[disc.mat$category == "autozooid", traits[2]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. discors")," autozooid"))) + 
+    scale_y_continuous(name = traits[2]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = disc.col.form)
+
 ##### intermedia ----
 p.int.auto.len = ggplot(int.mat[int.mat$category == "autozooid",]) + 
     geom_density(aes(x = int.mat[int.mat$category == "autozooid", traits[1]], 
@@ -367,6 +457,29 @@ p.int.auto.wid = ggplot(data = int.mat[int.mat$category == "autozooid",]) +
     plot.theme +
     ggtitle(expression(paste(italic("M. intermedia")," autozooid"))) + 
     scale_x_continuous(name = traits[2]) +
+    scale_color_manual(values = int.col.form)
+
+int_mean_by_formation = int.mat %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+p.int.auto.len.wid = ggplot(data = int_mean_by_formation) + 
+    geom_point(aes(x = avg.len,
+                   y = avg.wid, 
+                   group = time,
+                   col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. intermedia")," autozooid"))) + 
+    scale_x_continuous(name = traits[1]) +
+    scale_y_continuous(name = traits[2]) +
     scale_color_manual(values = int.col.form)
 
 # p.int.avic.len = ggplot(int.mat[int.mat$category == "avicularium",]) + 
@@ -417,6 +530,28 @@ p.int.auto.wid = ggplot(data = int.mat[int.mat$category == "autozooid",]) +
 #        file = "./Results/int.trait.distribution.png", 
 #        width = 14, height = 20, units = "cm")
 
+ggplot(int.mat[int.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = int.mat[int.mat$category == "autozooid", traits[1]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. intermedia")," autozooid"))) + 
+    scale_y_continuous(name = traits[1]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = int.col.form)
+
+ggplot(int.mat[int.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = int.mat[int.mat$category == "autozooid", traits[2]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. intermedia")," autozooid"))) + 
+    scale_y_continuous(name = traits[2]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = int.col.form)
+
 ##### speculum ----
 p.spec.auto.len = ggplot(spec.mat[spec.mat$category == "autozooid",]) + 
     geom_density(aes(x = spec.mat[spec.mat$category == "autozooid", traits[1]], 
@@ -434,6 +569,29 @@ p.spec.auto.wid = ggplot(data = spec.mat[spec.mat$category == "autozooid",]) +
     plot.theme +
     ggtitle(expression(paste(italic("M. speculum")," autozooid"))) + 
     scale_x_continuous(name = traits[2]) +
+    scale_color_manual(values = spec.col.form)
+
+spec_mean_by_formation = spec.mat %>% #use this going forward
+    filter(category == "autozooid") %>%
+    dplyr::group_by(time) %>%
+    dplyr::summarize(n.zooid = length(id),
+                     
+                     avg.len = mean(ln.len, na.rm = T),
+                     sd.len = sd(ln.len, na.rm = T),
+                     
+                     avg.wid = mean(ln.wid, na.rm = T),
+                     sd.wid = sd(ln.wid, na.rm = T)) %>%
+    as.data.frame()
+
+p.spec.auto.len.wid = ggplot(data = spec_mean_by_formation) + 
+    geom_point(aes(x = avg.len,
+                   y = avg.wid, 
+                   group = time,
+                   col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. speculum")," autozooid"))) + 
+    scale_x_continuous(name = traits[1]) +
+    scale_y_continuous(name = traits[2]) +
     scale_color_manual(values = spec.col.form)
 
 # p.spec.avic.len = ggplot(spec.mat[spec.mat$category == "avicularium",]) + 
@@ -485,6 +643,28 @@ p.spec.auto.wid = ggplot(data = spec.mat[spec.mat$category == "autozooid",]) +
 #        file = "./Results/spec.trait.distribution.png", 
 #        width = 14, height = 20, units = "cm")
 
+ggplot(spec.mat[spec.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = spec.mat[spec.mat$category == "autozooid", traits[1]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. speculum")," autozooid"))) + 
+    scale_y_continuous(name = traits[1]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = spec.col.form)
+
+ggplot(spec.mat[spec.mat$category == "autozooid",]) + 
+    geom_boxplot(aes(x = time,
+                     y = spec.mat[spec.mat$category == "autozooid", traits[2]],
+                     col = time)) + 
+    plot.theme +
+    ggtitle(expression(paste(italic("M. speculum")," autozooid"))) + 
+    scale_y_continuous(name = traits[2]) +
+    scale_x_discrete(name = "Formation",
+                     guide = guide_axis(angle = 45)) +
+    scale_color_manual(values = spec.col.form)
+
 ##### FULL FIGURE -----
 fig = list(p.agon.auto.len, p.disc.auto.len,
            p.int.auto.len, p.spec.auto.len,
@@ -496,7 +676,6 @@ ml
 ggsave(ml,
        file = "./Results/auto.trait.distribution.png", 
        width = 14, height = 20, units = "cm")
-       
        
 #### SPLIT BY FORMATION ----
 
